@@ -436,11 +436,24 @@
             box-shadow: var(--shadow-sm);
         }
 
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         .table th, .table td {
             padding: 1rem 1.5rem;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
             font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        .table th {
+            position: sticky;
+            top: 0;
+            background: var(--tertiary-bg);
+            z-index: 10;
         }
 
         .table th {
@@ -458,6 +471,17 @@
 
         .table tbody tr:hover {
             background: rgba(99, 102, 241, 0.05);
+        }
+
+        .grade-badge {
+            background: var(--accent-secondary);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
         }
 
         /* Status Indicators */
@@ -1107,22 +1131,24 @@
                     <div style="font-size: 0.8rem; color: #666;">⚠️ This will delete all students and attendance records</div>
                 </div>
                 <div id="report-table-container" class="hidden">
-                    <table class="table" id="report-table">
-                        <thead>
-                            <tr>
-                                <th>Matric</th>
-                                <th>Name</th>
-                                <th>Faculty</th>
-                                <th>Department</th>
-                                <th>Grade</th>
-                                <th>Phone</th>
-                                <th>Time</th>
-                                <th>Operator</th>
-                                <th>Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody id="report-tbody"></tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table" id="report-table">
+                            <thead>
+                                <tr>
+                                    <th>Matric Number</th>
+                                    <th>Student Name</th>
+                                    <th>Faculty</th>
+                                    <th>Department</th>
+                                    <th>Grade</th>
+                                    <th>Phone Number</th>
+                                    <th>Attendance Time</th>
+                                    <th>Operator</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="report-tbody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1266,7 +1292,44 @@
                 document.getElementById('student-source').value = student.source || '';
                 document.getElementById('student-next-of-kin').value = student.next_of_kin || '';
                 phoneInput.value = student.phone || '';
-                phoneInput.focus();
+
+                // Check if already marked today
+                const today = new Date().toISOString().split('T')[0];
+                const { data: existingAttendance, error: attendanceError } = await supabase
+                    .from('attendance')
+                    .select('ts, operators(name)')
+                    .eq('school_id', currentSchool.id)
+                    .eq('matric_number', matric)
+                    .eq('attendance_date', today)
+                    .single();
+
+                if (existingAttendance && !attendanceError) {
+                    const attendanceTime = new Date(existingAttendance.ts);
+                    const timeString = attendanceTime.toLocaleString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+
+                    // Show warning that student already marked
+                    document.getElementById('attendance-status').innerHTML = `
+                        <div class="status error">
+                            ⚠️ <strong>${student.name}</strong> already marked attendance today at ${timeString}
+                            ${existingAttendance.operators ? ` by ${existingAttendance.operators.name}` : ''}
+                        </div>
+                    `;
+                    document.getElementById('attendance-status').classList.remove('hidden');
+
+                    // Disable mark button
+                    markBtn.disabled = true;
+                    markBtn.textContent = 'Already Marked Today';
+                } else {
+                    // Clear any previous status
+                    document.getElementById('attendance-status').classList.add('hidden');
+                    markBtn.disabled = false;
+                    markBtn.textContent = 'Mark Attendance';
+                    phoneInput.focus();
+                }
             } else {
                 studentNameInput.value = '';
                 document.getElementById('student-faculty').value = '';
@@ -1275,6 +1338,11 @@
                 document.getElementById('student-source').value = '';
                 document.getElementById('student-next-of-kin').value = '';
                 phoneInput.value = '';
+
+                // Clear status
+                document.getElementById('attendance-status').classList.add('hidden');
+                markBtn.disabled = false;
+                markBtn.textContent = 'Mark Attendance';
             }
         }
 
@@ -1285,6 +1353,21 @@
             const notes = notesInput.value.trim();
 
             if (!matric || !currentSchool) return;
+
+            // Double-check if already marked today before submitting
+            const today = new Date().toISOString().split('T')[0];
+            const { data: existingAttendance } = await supabase
+                .from('attendance')
+                .select('id')
+                .eq('school_id', currentSchool.id)
+                .eq('matric_number', matric)
+                .eq('attendance_date', today)
+                .single();
+
+            if (existingAttendance) {
+                showStatus('⚠️ This student has already been marked for attendance today!', 'error');
+                return;
+            }
 
             markBtn.disabled = true;
             markBtn.innerHTML = '<div class="loading"></div> Marking...';
@@ -1301,11 +1384,14 @@
 
                 if (error) throw error;
 
-                showStatus('Attendance marked successfully!', 'success');
+                showStatus('✅ Attendance marked successfully!', 'success');
                 resetAttendanceForm();
+
+                // Refresh dashboard data
+                loadDashboardData();
             } catch (error) {
                 console.error('Error marking attendance:', error);
-                showStatus('Error marking attendance: ' + error.message, 'error');
+                showStatus('❌ Error marking attendance: ' + error.message, 'error');
             } finally {
                 markBtn.disabled = false;
                 markBtn.textContent = 'Mark Attendance';
@@ -1574,14 +1660,27 @@
             tbody.innerHTML = '';
 
             attendance.forEach(record => {
+                const attendanceTime = new Date(record.ts);
+                const timeString = attendanceTime.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${record.matric_number}</td>
-                    <td>${record.students.name}</td>
-                    <td>${record.phone_captured || ''}</td>
-                    <td>${new Date(record.ts).toLocaleTimeString()}</td>
-                    <td>${record.operators?.name || 'Unknown'}</td>
-                    <td>${record.notes || ''}</td>
+                    <td><code>${record.matric_number}</code></td>
+                    <td><strong>${record.students.name}</strong></td>
+                    <td>${record.students.faculty || '—'}</td>
+                    <td>${record.students.department || '—'}</td>
+                    <td><span class="grade-badge">${record.students.grade || '—'}</span></td>
+                    <td>${record.students.phone ? `<a href="tel:${record.students.phone}">${record.students.phone}</a>` : '—'}</td>
+                    <td><small>${timeString}</small></td>
+                    <td>${record.operators?.name || 'System'}</td>
+                    <td>${record.notes || '—'}</td>
                 `;
                 tbody.appendChild(row);
             });
