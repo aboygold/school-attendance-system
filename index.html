@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Attendance System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="dns-prefetch" href="https://sjrhljtjgxjohkipxaky.supabase.co">
+    <style>
+        :root {
+            /* Dark Theme Color Palette */
+            --primary-bg: #0a0a0f;
+            --secondary-bg: #111118;
+            --tertiary-bg: #1a1a24;
+            --card-bg: rgba(26, 26, 36, 0.95);
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-error: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border-color: rgba(99, 102, 241, 0.2);
+            --border-hover: rgba(99, 102, 241, 0.4);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            --gradient-primary: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            --gradient-bg: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gradient-bg);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2.5rem 0;
+            margin-bottom: 3rem;
+            position: relative;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-bg);
+            opacity: 0.05;
+            border-radius: 1rem;
+            z-index: -1;
+        }
+
+        .brand-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .logo-main {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            text-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+            line-height: 1;
+        }
+
+        .logo-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        .brand-tagline {
+            margin-top: 0.5rem;
+        }
+
+        .tagline-text {
+            font-size: 0.75rem;
+            color: var(--accent-primary);
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .counters {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .counter {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            padding: 1.25rem 1.75rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .counter::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .counter:hover::before {
+            opacity: 0.05;
+        }
+
+        .counter:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--border-hover);
+        }
+
+        .counter-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .counter-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent-primary);
+            line-height: 1;
+        }
+
+        .operator-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.25rem;
+        }
+
+        .operator-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .operator-status {
+            font-size: 0.75rem;
+            color: var(--accent-success);
+            font-weight: 500;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.875rem 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.025em;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--gradient-primary);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .nav-btn:focus {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.025em;
+        }
+
+        input, select, textarea, button {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--secondary-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: var(--tertiary-bg);
+        }
+
+        button {
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.875rem;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-danger {
+            background: var(--accent-error);
+            border-color: var(--accent-error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+        }
+
+        /* Grid Layouts */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-xl);
+            border-color: var(--border-hover);
+        }
+
+        .card h3 {
+            margin-bottom: 2rem;
+            color: var(--accent-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .table th, .table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .table th {
+            background: var(--tertiary-bg);
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        /* Status Indicators */
+        .status {
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-error);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--accent-primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .text-muted {
+            color: var(--text-muted);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 2rem;
+                text-align: center;
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .brand-section {
+                align-items: center;
+            }
+
+            .logo-main {
+                font-size: 2rem;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 1.5rem;
+                width: 100%;
+            }
+
+            .counters {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .operator-info {
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem 0.75rem;
+            }
+
+            header {
+                padding: 1.25rem;
+                margin-bottom: 2rem;
+                gap: 1.5rem;
+            }
+
+            .logo-main {
+                font-size: 1.75rem;
+            }
+
+            .logo-subtitle {
+                font-size: 0.8rem;
+            }
+
+            .nav {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .nav-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.8rem;
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .counters {
+                flex-direction: row;
+                justify-content: space-around;
+                gap: 0.75rem;
+                width: 100%;
+            }
+
+            .counter {
+                padding: 1rem;
+                min-width: 100px;
+                flex: 1;
+            }
+
+            .counter-value {
+                font-size: 1.25rem;
+            }
+
+            .card {
+                padding: 1.25rem;
+                margin-bottom: 1rem;
+            }
+
+            .card h3 {
+                font-size: 1.25rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .table {
+                font-size: 0.8rem;
+            }
+
+            .table th, .table td {
+                padding: 0.5rem 0.75rem;
+            }
+
+            input, select, textarea, button {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.75rem 0.5rem;
+            }
+
+            header {
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .logo-main {
+                font-size: 1.5rem;
+            }
+
+            .nav-btn {
+                padding: 0.625rem 0.875rem;
+                font-size: 0.75rem;
+                min-width: 100px;
+            }
+
+            .counters {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .counter {
+                padding: 0.875rem 1rem;
+                min-width: unset;
+            }
+
+            .counter-value {
+                font-size: 1.125rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .table th, .table td {
+                padding: 0.5rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Performance Optimizations */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        .card, .nav-btn, .counter {
+            will-change: transform;
+            transform: translateZ(0); /* Hardware acceleration */
+        }
+
+        /* Touch optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .nav-btn:hover, .counter:hover, .card:hover {
+                transform: none;
+            }
+
+            .nav-btn:active, .counter:active {
+                transform: scale(0.98);
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+
+            .nav, .btn, header {
+                display: none !important;
+            }
+
+            .card {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 4rem;
+            padding: 2rem 0;
+            border-top: 1px solid var(--border-color);
+            background: rgba(10, 10, 15, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .footer-logo {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            letter-spacing: -0.025em;
+        }
+
+        .footer-company {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .footer-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.25rem;
+        }
+
+        .footer-copyright {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .footer-version {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            opacity: 0.8;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--secondary-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-secondary);
+        }
+
+        /* Dashboard Styles */
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .dashboard-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--border-hover);
+        }
+
+        .metric-icon {
+            font-size: 2.5rem;
+            opacity: 0.8;
+        }
+
+        .metric-content {
+            flex: 1;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-primary);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+
+        /* Chart.js Dark Theme */
+        :root {
+            --chart-bg: var(--card-bg);
+            --chart-text: var(--text-primary);
+            --chart-grid: var(--border-color);
+        }
+
+        /* Mobile Footer */
+        @media (max-width: 768px) {
+            .footer {
+                margin-top: 2rem;
+                padding: 1.5rem 0;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+                padding: 0 1rem;
+            }
+
+            .footer-meta {
+                align-items: center;
+            }
+
+            .dashboard-header {
+                margin-bottom: 2rem;
+            }
+
+            .dashboard-header h2 {
+                font-size: 2rem;
+            }
+
+            .metric-card {
+                padding: 1.5rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .metric-icon {
+                font-size: 2rem;
+            }
+
+            .metric-value {
+                font-size: 2rem;
+            }
+
+            .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="brand-section">
+                <div class="logo-container">
+                    <div class="logo-main">School Attendance System</div>
+                    <div class="logo-subtitle">by BESTBUY INTERNATIONAL TECHNOLOGY</div>
+                </div>
+                <div class="brand-tagline">
+                    <span class="tagline-text">Smart • Secure • Efficient</span>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="counters">
+                    <div class="counter">
+                        <div class="counter-label">Today's Attendance</div>
+                        <div class="counter-value" id="today-count">0</div>
+                    </div>
+                    <div class="counter">
+                        <div class="counter-label">My Records</div>
+                        <div class="counter-value" id="my-count">0</div>
+                    </div>
+                </div>
+                <div class="operator-info">
+                    <div class="operator-name">Operator: SOLUSCIPHER</div>
+                    <div class="operator-status">● Online</div>
+                </div>
+            </div>
+        </header>
+
+
+        <nav class="nav">
+            <button class="nav-btn active" data-section="dashboard">Dashboard</button>
+            <button class="nav-btn" data-section="attendance">Attendance</button>
+            <button class="nav-btn" data-section="import">Import Students</button>
+            <button class="nav-btn hidden" data-section="admin">Admin</button>
+            <button class="nav-btn" data-section="reports">Reports</button>
+        </nav>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="dashboard-header">
+                <h2>Attendance Analytics Dashboard</h2>
+                <p class="dashboard-subtitle">Real-time insights and performance metrics</p>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="grid grid-4">
+                <div class="metric-card">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-content">
+                        <div class="metric-value" id="total-students">0</div>
+                        <div class="metric-label">Total Students</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">✅</div>
+                    <div class="metric-content">
+                        <div class="metric-value" id="today-attendance">0</div>
+                        <div class="metric-label">Today's Attendance</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📈</div>
+                    <div class="metric-content">
+                        <div class="metric-value" id="attendance-rate">0%</div>
+                        <div class="metric-label">Attendance Rate</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🏆</div>
+                    <div class="metric-content">
+                        <div class="metric-value" id="top-performer">N/A</div>
+                        <div class="metric-label">Top Performer</div>
+                    </div>
+                </div>
+            </div>
+
+
+        </section>
+
+        <!-- Attendance Section -->
+        <section id="attendance" class="section active">
+            <div class="card">
+                <h3>Mark Attendance</h3>
+                <form id="attendance-form">
+                    <div class="form-group">
+                        <label for="matric-input">Matric Number</label>
+                        <input type="text" id="matric-input" placeholder="Enter matric number" required autofocus>
+                    </div>
+                    <div class="form-group">
+                        <label for="student-name">Student Name</label>
+                        <input type="text" id="student-name" readonly>
+                    </div>
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label>Faculty</label>
+                            <input type="text" id="student-faculty" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Department</label>
+                            <input type="text" id="student-department" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Grade</label>
+                            <input type="text" id="student-grade" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Source</label>
+                            <input type="text" id="student-source" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Next of Kin</label>
+                            <input type="text" id="student-next-of-kin" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone-input">Phone Number</label>
+                            <input type="tel" id="phone-input" placeholder="Phone number (optional)">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes-input">Notes</label>
+                        <textarea id="notes-input" rows="2" placeholder="Optional notes"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary" id="mark-btn">Mark Attendance</button>
+                </form>
+                <div id="attendance-status" class="hidden"></div>
+            </div>
+        </section>
+
+        <!-- Import Section -->
+        <section id="import" class="section">
+            <div class="card">
+                <h3>Import Student Master File</h3>
+                <form id="import-form">
+                    <div class="form-group">
+                        <label for="file-input">Select CSV or XLSX file</label>
+                        <input type="file" id="file-input" accept=".csv,.xlsx,.xls" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Import Students</button>
+                </form>
+                <div id="import-status"></div>
+                <div id="import-progress" class="hidden">
+                    <progress value="0" max="100"></progress>
+                    <span id="progress-text">0%</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Section -->
+        <section id="admin" class="section">
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>Manage Operators</h3>
+                    <button id="add-operator-btn" class="btn-primary">Add Operator</button>
+                    <div id="operators-list"></div>
+                </div>
+                <div class="card">
+                    <h3>System Settings</h3>
+                    <button id="reimport-btn" class="btn-primary">Re-run Last Import</button>
+                    <button id="clear-data-btn" class="btn-danger">Clear All Data</button>
+                    <button id="rotate-keys-btn" class="btn-danger">Rotate API Keys</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reports Section -->
+        <section id="reports" class="section">
+            <div class="card">
+                <h3>Attendance Reports</h3>
+                <div class="form-group">
+                    <label for="report-date">Select Date</label>
+                    <input type="date" id="report-date" value="">
+                </div>
+                <div class="grid grid-3">
+                    <button id="export-daily-csv-btn" class="btn-primary">Export Today's CSV</button>
+                    <button id="export-daily-xlsx-btn" class="btn-primary">Export Today's XLSX</button>
+                    <button id="view-report-btn" class="btn-primary">View Report</button>
+                </div>
+                <div class="grid grid-2" style="margin-top: 1rem;">
+                    <button id="clear-data-reports-btn" class="btn-danger">Clear All Data</button>
+                    <div style="font-size: 0.8rem; color: #666;">⚠️ This will delete all students and attendance records</div>
+                </div>
+                <div id="report-table-container" class="hidden">
+                    <table class="table" id="report-table">
+                        <thead>
+                            <tr>
+                                <th>Matric</th>
+                                <th>Name</th>
+                                <th>Faculty</th>
+                                <th>Department</th>
+                                <th>Grade</th>
+                                <th>Phone</th>
+                                <th>Time</th>
+                                <th>Operator</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">School Attendance System</div>
+                    <div class="footer-company">by BESTBUY INTERNATIONAL TECHNOLOGY</div>
+                </div>
+                <div class="footer-meta">
+                    <div class="footer-copyright">© 2025 All Rights Reserved</div>
+                    <div class="footer-version">v2.0.0</div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Supabase client setup
+        const SUPABASE_URL = 'https://sjrhljtjgxjohkipxaky.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcmhsanRqZ3hqb2hraXB4YWt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwOTMzNDQsImV4cCI6MjA3OTY2OTM0NH0.n57XovSTvg6WAAGagGScMs7OjLi7zc_GqrwALWa0fVQ';
+        const { createClient } = window.supabase;
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Global state
+        let currentUser = null;
+        let currentOperator = null;
+        let currentSchool = { id: '550e8400-e29b-41d4-a716-446655440001', name: 'University of Lagos' };
+        let realtimeSubscription = null;
+
+        // DOM elements
+        const matricInput = document.getElementById('matric-input');
+        const studentNameInput = document.getElementById('student-name');
+        const phoneInput = document.getElementById('phone-input');
+        const notesInput = document.getElementById('notes-input');
+        const markBtn = document.getElementById('mark-btn');
+        const attendanceStatus = document.getElementById('attendance-status');
+        const todayCountEl = document.getElementById('today-count');
+        const myCountEl = document.getElementById('my-count');
+        const logoutBtn = document.getElementById('logout-btn');
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('.section');
+
+        // Initialize app
+        async function init() {
+            await setDefaultOperator();
+
+            // Load initial dashboard data
+            await loadDashboardData();
+
+            // Set default report date to today
+            document.getElementById('report-date').valueAsDate = new Date();
+
+            // Event listeners
+            setupEventListeners();
+        }
+
+        async function setDefaultOperator() {
+            currentSchool = {
+                id: '550e8400-e29b-41d4-a716-446655440001',
+                name: 'University of Lagos'
+            };
+            currentOperator = {
+                id: '00000000-0000-0000-0000-000000000001',
+                name: 'SOLUSCIPHER',
+                is_admin: true
+            };
+            startRealtime();
+            updateCounters();
+        }
+
+        function setupEventListeners() {
+            // Navigation
+            navBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const sectionId = btn.dataset.section;
+                    showSection(sectionId);
+                });
+            });
+
+            // Attendance form
+            document.getElementById('attendance-form').addEventListener('submit', handleAttendanceSubmit);
+            matricInput.addEventListener('input', handleMatricInput);
+            phoneInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    markBtn.click();
+                }
+            });
+
+            // Import
+            document.getElementById('file-input').addEventListener('change', handleFileSelect);
+            document.getElementById('import-form').addEventListener('submit', handleImportSubmit);
+
+            // Reports
+            document.getElementById('export-daily-csv-btn').addEventListener('click', () => exportDailyReport('csv'));
+            document.getElementById('export-daily-xlsx-btn').addEventListener('click', () => exportDailyReport('xlsx'));
+            document.getElementById('view-report-btn').addEventListener('click', viewReport);
+            document.getElementById('clear-data-reports-btn').addEventListener('click', clearAllData);
+
+            // Admin
+            document.getElementById('clear-data-btn').addEventListener('click', clearAllData);
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            navBtns.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+
+            // Load dashboard data when dashboard is shown
+            if (sectionId === 'dashboard') {
+                loadDashboardData();
+            }
+        }
+
+        // Attendance functions
+        async function handleMatricInput() {
+            const matric = matricInput.value.trim();
+            if (matric.length < 3 || !currentSchool) return;
+
+            const { data: student, error } = await supabase
+                .from('students')
+                .select('*')
+                .eq('school_id', currentSchool.id)
+                .eq('matric_number', matric)
+                .single();
+
+            if (student) {
+                studentNameInput.value = student.name;
+                document.getElementById('student-faculty').value = student.faculty || '';
+                document.getElementById('student-department').value = student.department || '';
+                document.getElementById('student-grade').value = student.grade || '';
+                document.getElementById('student-source').value = student.source || '';
+                document.getElementById('student-next-of-kin').value = student.next_of_kin || '';
+                phoneInput.value = student.phone || '';
+                phoneInput.focus();
+            } else {
+                studentNameInput.value = '';
+                document.getElementById('student-faculty').value = '';
+                document.getElementById('student-department').value = '';
+                document.getElementById('student-grade').value = '';
+                document.getElementById('student-source').value = '';
+                document.getElementById('student-next-of-kin').value = '';
+                phoneInput.value = '';
+            }
+        }
+
+        async function handleAttendanceSubmit(e) {
+            e.preventDefault();
+            const matric = matricInput.value.trim();
+            const phone = phoneInput.value.trim();
+            const notes = notesInput.value.trim();
+
+            if (!matric || !currentSchool) return;
+
+            markBtn.disabled = true;
+            markBtn.innerHTML = '<div class="loading"></div> Marking...';
+
+            try {
+                const { data, error } = await supabase.rpc('mark_attendance', {
+                    p_school_id: currentSchool.id,
+                    p_matric: matric,
+                    p_date: new Date().toISOString().split('T')[0],
+                    p_operator_id: currentOperator.id,
+                    p_phone: phone || null,
+                    p_notes: notes || null
+                });
+
+                if (error) throw error;
+
+                showStatus('Attendance marked successfully!', 'success');
+                resetAttendanceForm();
+            } catch (error) {
+                console.error('Error marking attendance:', error);
+                showStatus('Error marking attendance: ' + error.message, 'error');
+            } finally {
+                markBtn.disabled = false;
+                markBtn.textContent = 'Mark Attendance';
+            }
+        }
+
+        function resetAttendanceForm() {
+            matricInput.value = '';
+            studentNameInput.value = '';
+            document.getElementById('student-faculty').value = '';
+            document.getElementById('student-department').value = '';
+            document.getElementById('student-grade').value = '';
+            document.getElementById('student-source').value = '';
+            document.getElementById('student-next-of-kin').value = '';
+            phoneInput.value = '';
+            notesInput.value = '';
+            matricInput.focus();
+        }
+
+        function showStatus(message, type) {
+            attendanceStatus.textContent = message;
+            attendanceStatus.className = `status ${type}`;
+            attendanceStatus.classList.remove('hidden');
+            setTimeout(() => attendanceStatus.classList.add('hidden'), 3000);
+        }
+
+        // Realtime
+        function startRealtime() {
+            realtimeSubscription = supabase
+                .channel('attendance_changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, () => {
+                    updateCounters();
+                })
+                .subscribe();
+        }
+
+        function stopRealtime() {
+            if (realtimeSubscription) {
+                supabase.removeChannel(realtimeSubscription);
+                realtimeSubscription = null;
+            }
+        }
+
+        async function updateCounters() {
+            if (!currentSchool) {
+                todayCountEl.textContent = '0';
+                myCountEl.textContent = '0';
+                return;
+            }
+
+            // Today count for school
+            const { data: todayData, error: todayError } = await supabase
+                .from('attendance')
+                .select('id', { count: 'exact' })
+                .eq('school_id', currentSchool.id)
+                .eq('attendance_date', new Date().toISOString().split('T')[0]);
+
+            if (!todayError) {
+                todayCountEl.textContent = todayData.length;
+            }
+
+            // My count for school
+            if (currentOperator) {
+                const { data: myData, error: myError } = await supabase
+                    .from('attendance')
+                    .select('id', { count: 'exact' })
+                    .eq('school_id', currentSchool.id)
+                    .eq('attendance_date', new Date().toISOString().split('T')[0])
+                    .eq('operator_id', currentOperator.id);
+
+                if (!myError) {
+                    myCountEl.textContent = myData.length;
+                }
+            }
+        }
+
+        // Import functions
+        let currentHeaders = [];
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Parse file to get headers
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = e.target.result;
+                let headers;
+                if (file.name.endsWith('.csv')) {
+                    const csvData = XLSX.utils.csv_to_sheet(data);
+                    headers = XLSX.utils.sheet_to_json(csvData, { header: 1 })[0];
+                } else {
+                    const workbook = XLSX.read(data, { type: 'binary' });
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                    headers = jsonData[0];
+                }
+                currentHeaders = headers;
+            };
+            reader.readAsBinaryString(file);
+        }
+
+
+        async function handleImportSubmit(e) {
+            e.preventDefault();
+            const file = document.getElementById('file-input').files[0];
+
+            if (!file) return;
+
+            // Parse file again for import
+            let data;
+            if (file.name.endsWith('.csv')) {
+                const text = await file.text();
+                data = XLSX.utils.csv_to_sheet(text);
+                data = XLSX.utils.sheet_to_json(data, { header: 1, defval: null });
+            } else {
+                const arrayBuffer = await file.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const sheet = workbook.Sheets[sheetName];
+                data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null, blankrows: false });
+            }
+
+            console.log('Parsed data length:', data.length);
+
+            // Auto-detect columns from first row
+            const headers = data[0];
+            const findColumn = (names) => {
+                for (let i = 0; i < headers.length; i++) {
+                    const header = headers[i]?.toString().toLowerCase().trim();
+                    if (header && names.some(name => header.includes(name.toLowerCase()))) {
+                        return i;
+                    }
+                }
+                return -1;
+            };
+
+            const matricCol = findColumn(['matric', 'number', 'id']);
+            const lastNameCol = findColumn(['last', 'surname']);
+            const otherNamesCol = findColumn(['other', 'first', 'given']);
+            const facultyCol = findColumn(['faculty']);
+            const departmentCol = findColumn(['department']);
+            const gradeCol = findColumn(['grade', 'level', 'class']);
+            const sourceCol = findColumn(['source']);
+            const nextOfKinCol = findColumn(['next', 'kin', 'guardian']);
+            const phoneCol = findColumn(['phone', 'mobile', 'contact']);
+
+            if (matricCol === -1 || lastNameCol === -1 || otherNamesCol === -1 ||
+                facultyCol === -1 || departmentCol === -1 || gradeCol === -1 ||
+                sourceCol === -1 || nextOfKinCol === -1) {
+                alert('Could not auto-detect required columns. Please check your file headers.');
+                return;
+            }
+
+            const progressEl = document.getElementById('import-progress');
+            const progressText = document.getElementById('progress-text');
+            progressEl.classList.remove('hidden');
+
+            try {
+                let data;
+                if (file.name.endsWith('.csv')) {
+                    const text = await file.text();
+                    data = XLSX.utils.csv_to_sheet(text);
+                    data = XLSX.utils.sheet_to_json(data, { header: 1, defval: null });
+                } else {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null, blankrows: false });
+                }
+
+                // Remove header
+                data.shift();
+                console.log('Total data rows after header removal:', data.length);
+
+                // Batch upsert
+                const batchSize = 500;
+                let successCount = 0;
+                let errorCount = 0;
+                const errors = [];
+                console.log('Starting batch processing...');
+
+                for (let i = 0; i < data.length; i += batchSize) {
+                    const batch = data.slice(i, i + batchSize);
+                    console.log(`Processing batch ${Math.floor(i/batchSize) + 1}, rows ${i} to ${i + batch.length - 1}`);
+                    const students = batch.map(row => ({
+                        school_id: currentSchool.id,
+                        matric_number: row[matricCol]?.toString().trim(),
+                        last_name: row[lastNameCol]?.toString().trim(),
+                        other_names: row[otherNamesCol]?.toString().trim(),
+                        faculty: row[facultyCol]?.toString().trim(),
+                        department: row[departmentCol]?.toString().trim(),
+                        grade: row[gradeCol]?.toString().trim(),
+                        source: row[sourceCol]?.toString().trim(),
+                        next_of_kin: row[nextOfKinCol]?.toString().trim(),
+                        phone: phoneCol !== null ? row[phoneCol]?.toString().trim() : null
+                    })).filter(s => s.matric_number && s.last_name && s.other_names);
+
+                    console.log(`Batch ${Math.floor(i/batchSize) + 1}: ${students.length} valid students`);
+
+                    if (students.length > 0) {
+                        const { error } = await supabase
+                            .from('students')
+                            .upsert(students, { onConflict: 'school_id,matric_number' });
+
+                        if (error) {
+                            console.error(`Batch ${Math.floor(i/batchSize) + 1} error:`, error);
+                            errorCount += students.length;
+                            errors.push(`Batch ${Math.floor(i/batchSize) + 1}: ${error.message}`);
+                        } else {
+                            successCount += students.length;
+                            console.log(`Batch ${Math.floor(i/batchSize) + 1} success: ${students.length} students`);
+                        }
+                    }
+
+                    // Update progress
+                    const progress = Math.round((i + batch.length) / data.length * 100);
+                    progressEl.querySelector('progress').value = progress;
+                    progressText.textContent = `${progress}%`;
+                }
+
+                let statusMessage = `Import completed. ${successCount} students imported successfully.`;
+                if (errorCount > 0) {
+                    statusMessage += ` ${errorCount} errors.`;
+                }
+                document.getElementById('import-status').innerHTML = `<div class="status ${errorCount > 0 ? 'error' : 'success'}">${statusMessage}</div>`;
+                if (errors.length > 0) {
+                    document.getElementById('import-status').innerHTML += '<ul>' + errors.map(e => `<li>${e}</li>`).join('') + '</ul>';
+                }
+
+            } catch (error) {
+                console.error('Import error:', error);
+                document.getElementById('import-status').innerHTML = `<div class="status error">Import failed: ${error.message}</div>`;
+            } finally {
+                progressEl.classList.add('hidden');
+            }
+        }
+
+        // Reports
+        async function viewReport() {
+            const date = document.getElementById('report-date').value;
+            if (!date || !currentSchool) return;
+
+            const { data: attendance, error } = await supabase
+                .from('attendance')
+                .select(`
+                    matric_number,
+                    phone_captured,
+                    ts,
+                    notes,
+                    students!inner(name, faculty, department, grade, source, next_of_kin, phone),
+                    operators(name)
+                `)
+                .eq('school_id', currentSchool.id)
+                .eq('attendance_date', date)
+                .order('ts', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching report:', error);
+                return;
+            }
+
+            const tbody = document.getElementById('report-tbody');
+            tbody.innerHTML = '';
+
+            attendance.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.matric_number}</td>
+                    <td>${record.students.name}</td>
+                    <td>${record.phone_captured || ''}</td>
+                    <td>${new Date(record.ts).toLocaleTimeString()}</td>
+                    <td>${record.operators?.name || 'Unknown'}</td>
+                    <td>${record.notes || ''}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('report-table-container').classList.remove('hidden');
+        }
+
+        async function exportDailyReport(format) {
+            const date = new Date().toISOString().split('T')[0]; // Today's date
+
+            const { data: attendance, error } = await supabase
+                .from('attendance')
+                .select(`
+                    matric_number,
+                    phone_captured,
+                    ts,
+                    notes,
+                    students!inner(name, faculty, department, grade, source, next_of_kin, phone),
+                    operators(name)
+                `)
+                .eq('school_id', currentSchool.id)
+                .eq('attendance_date', date)
+                .order('ts', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching daily report:', error);
+                return;
+            }
+
+            const data = attendance.map(record => ({
+                Matric: record.matric_number,
+                Name: record.students.name,
+                Faculty: record.students.faculty || '',
+                Department: record.students.department || '',
+                Grade: record.students.grade || '',
+                Source: record.students.source || '',
+                'Next of Kin': record.students.next_of_kin || '',
+                'Student Phone': record.students.phone || '',
+                'Captured Phone': record.phone_captured || '',
+                Time: new Date(record.ts).toLocaleString(),
+                Operator: record.operators?.name || 'Unknown',
+                Notes: record.notes || ''
+            }));
+
+            if (format === 'csv') {
+                const csv = [Object.keys(data[0]).join(',')];
+                data.forEach(row => {
+                    csv.push(Object.values(row).map(v => `"${v}"`).join(','));
+                });
+                downloadFile(csv.join('\n'), `attendance_${date}.csv`, 'text/csv');
+            } else if (format === 'xlsx') {
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
+                XLSX.writeFile(wb, `attendance_${date}.xlsx`);
+            }
+        }
+
+        async function exportReport(format) {
+            const date = document.getElementById('report-date').value;
+            if (!date || !currentSchool) return;
+
+            const { data: attendance, error } = await supabase
+                .from('attendance')
+                .select(`
+                    matric_number,
+                    phone_captured,
+                    ts,
+                    notes,
+                    students!inner(name),
+                    operators(name)
+                `)
+                .eq('school_id', currentSchool.id)
+                .eq('attendance_date', date)
+                .order('ts', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching report:', error);
+                return;
+            }
+
+            const data = attendance.map(record => ({
+                Matric: record.matric_number,
+                Name: record.students.name,
+                Faculty: record.students.faculty || '',
+                Department: record.students.department || '',
+                Grade: record.students.grade || '',
+                Source: record.students.source || '',
+                'Next of Kin': record.students.next_of_kin || '',
+                'Student Phone': record.students.phone || '',
+                'Captured Phone': record.phone_captured || '',
+                Time: new Date(record.ts).toLocaleString(),
+                Operator: record.operators?.name || 'Unknown',
+                Notes: record.notes || ''
+            }));
+
+            if (format === 'csv') {
+                const csv = [Object.keys(data[0]).join(',')];
+                data.forEach(row => {
+                    csv.push(Object.values(row).map(v => `"${v}"`).join(','));
+                });
+                downloadFile(csv.join('\n'), `attendance_${date}.csv`, 'text/csv');
+            } else if (format === 'xlsx') {
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
+                XLSX.writeFile(wb, `attendance_${date}.xlsx`);
+            }
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Admin functions
+        async function clearAllData() {
+            if (!confirm('Are you sure you want to clear ALL data? This will delete all students and attendance records. This action cannot be undone!')) {
+                return;
+            }
+
+            try {
+                // Clear in order to avoid foreign key issues
+                await supabase.from('attendance').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                await supabase.from('students').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                await supabase.from('operators').delete().eq('is_admin', false);
+
+                // Recreate default operator
+                await supabase.from('operators').upsert({
+                    id: '00000000-0000-0000-0000-000000000001',
+                    school_id: '550e8400-e29b-41d4-a716-446655440001',
+                    auth_uid: '00000000-0000-0000-0000-000000000000',
+                    name: 'SOLUSCIPHER',
+                    is_admin: true
+                });
+
+                alert('All data cleared successfully. You can now import data for a new school.');
+                location.reload(); // Refresh to reset counters
+            } catch (error) {
+                console.error('Error clearing data:', error);
+                alert('Error clearing data: ' + error.message);
+            }
+        }
+
+        // Dashboard functions
+        async function loadDashboardData() {
+            try {
+                await loadKeyMetrics();
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        async function loadKeyMetrics() {
+            // Total students
+            const { count: totalStudents } = await supabase
+                .from('students')
+                .select('*', { count: 'exact', head: true })
+                .eq('school_id', currentSchool.id);
+
+            document.getElementById('total-students').textContent = totalStudents || 0;
+
+            // Today's attendance
+            const today = new Date().toISOString().split('T')[0];
+            const { count: todayAttendance } = await supabase
+                .from('attendance')
+                .select('*', { count: 'exact', head: true })
+                .eq('school_id', currentSchool.id)
+                .eq('attendance_date', today);
+
+            document.getElementById('today-attendance').textContent = todayAttendance || 0;
+
+            // Attendance rate
+            if (totalStudents > 0) {
+                const rate = ((todayAttendance / totalStudents) * 100).toFixed(1);
+                document.getElementById('attendance-rate').textContent = `${rate}%`;
+            }
+
+            // Top performer (placeholder)
+            document.getElementById('top-performer').textContent = 'Loading...';
+        }
+
+
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
