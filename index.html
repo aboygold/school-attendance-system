@@ -213,9 +213,50 @@
         }
 
         .operator-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             font-size: 0.75rem;
-            color: var(--accent-success);
             font-weight: 500;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .status-indicator.online {
+            background: var(--accent-success);
+            box-shadow: 0 0 6px var(--accent-success);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.offline {
+            background: var(--accent-error);
+        }
+
+        .status-indicator.slow {
+            background: var(--accent-warning);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 6px var(--accent-success); }
+            50% { box-shadow: 0 0 12px var(--accent-success), 0 0 24px var(--accent-success); }
+            100% { box-shadow: 0 0 6px var(--accent-success); }
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .connection-info {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
         }
 
         /* Navigation */
@@ -1123,7 +1164,11 @@
                 </div>
                 <div class="operator-info">
                     <div class="operator-name">Not logged in</div>
-                    <div class="operator-status">● Offline</div>
+                    <div class="operator-status">
+                        <div class="status-indicator offline"></div>
+                        <span>Offline</span>
+                    </div>
+                    <div class="connection-info" id="connection-info">No connection</div>
                     <button id="shortcuts-btn" class="shortcuts-btn" title="Keyboard Shortcuts (F1)">⌨️</button>
                 </div>
             </div>
@@ -1674,6 +1719,18 @@
         let currentSchool = { id: '550e8400-e29b-41d4-a716-446655440001', name: 'University of Lagos' };
         let realtimeSubscription = null;
 
+        // Performance and connection monitoring
+        let connectionStatus = 'offline';
+        let lastSyncTime = null;
+        let networkSpeed = 'unknown';
+        let connectionQuality = 'poor';
+        let performanceMetrics = {
+            loadTime: Date.now(),
+            apiCalls: 0,
+            cacheHits: 0,
+            errors: 0
+        };
+
         // DOM elements
         const matricInput = document.getElementById('matric-input');
         const studentNameInput = document.getElementById('student-name');
@@ -1722,9 +1779,347 @@
         const showLoginBtn = document.getElementById('show-login');
         const mainNav = document.getElementById('main-nav');
 
+        // Performance and Connection Monitoring
+        function initConnectionMonitoring() {
+            // Monitor online/offline status
+            window.addEventListener('online', updateConnectionStatus);
+            window.addEventListener('offline', updateConnectionStatus);
+
+            // Monitor network speed
+            measureNetworkSpeed();
+
+            // Initial status update
+            updateConnectionStatus();
+
+            // Periodic connection checks
+            setInterval(updateConnectionStatus, 30000); // Every 30 seconds
+            setInterval(measureNetworkSpeed, 60000); // Every minute
+        }
+
+        function updateConnectionStatus() {
+            const isOnline = navigator.onLine;
+            const indicator = document.querySelector('.status-indicator');
+            const statusText = document.querySelector('.operator-status span');
+            const connectionInfo = document.getElementById('connection-info');
+
+            if (isOnline) {
+                connectionStatus = 'online';
+                indicator.className = 'status-indicator online';
+                statusText.textContent = 'Online';
+
+                // Test actual connectivity
+                testConnectivity().then(connected => {
+                    if (!connected) {
+                        connectionStatus = 'slow';
+                        indicator.className = 'status-indicator slow';
+                        statusText.textContent = 'Slow Connection';
+                    }
+                });
+            } else {
+                connectionStatus = 'offline';
+                indicator.className = 'status-indicator offline';
+                statusText.textContent = 'Offline';
+            }
+
+            // Update connection info
+            const lastSync = lastSyncTime ? new Date(lastSyncTime).toLocaleTimeString() : 'Never';
+            connectionInfo.textContent = `Last sync: ${lastSync} | ${connectionQuality} connection`;
+        }
+
+        async function testConnectivity() {
+            try {
+                const start = Date.now();
+                const response = await fetch('https://www.google.com/favicon.ico', {
+                    method: 'HEAD',
+                    cache: 'no-cache'
+                });
+                const end = Date.now();
+                const latency = end - start;
+
+                if (latency < 100) connectionQuality = 'excellent';
+                else if (latency < 300) connectionQuality = 'good';
+                else if (latency < 1000) connectionQuality = 'fair';
+                else connectionQuality = 'poor';
+
+                return response.ok;
+            } catch (error) {
+                connectionQuality = 'poor';
+                return false;
+            }
+        }
+
+        async function measureNetworkSpeed() {
+            try {
+                const start = Date.now();
+                const response = await fetch('https://httpbin.org/get?size=1024', {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+                const end = Date.now();
+                const duration = (end - start) / 1000; // seconds
+                const speedMbps = (1024 * 8) / (duration * 1000000); // Rough calculation
+
+                if (speedMbps > 10) networkSpeed = 'fast';
+                else if (speedMbps > 1) networkSpeed = 'medium';
+                else networkSpeed = 'slow';
+            } catch (error) {
+                networkSpeed = 'unknown';
+            }
+        }
+
+        // Performance Optimizations
+        function initPerformanceOptimizations() {
+            // Cache management (must be initialized first)
+            initCacheManagement();
+
+            // Debounce matric input for better performance
+            const debouncedMatricInput = debounce(window.originalHandleMatricInput, 300);
+            matricInput.addEventListener('input', debouncedMatricInput);
+
+            // Lazy load heavy components
+            lazyLoadComponents();
+
+            // Optimize rendering
+            optimizeRendering();
+
+            // Service worker for offline capability
+            registerServiceWorker();
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function lazyLoadComponents() {
+            // Lazy load export functionality
+            const exportObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Load export scripts when needed
+                        loadExportLibraries();
+                        exportObserver.disconnect();
+                    }
+                });
+            });
+
+            const reportsSection = document.getElementById('reports');
+            if (reportsSection) {
+                exportObserver.observe(reportsSection);
+            }
+        }
+
+        function loadExportLibraries() {
+            // Libraries are already loaded, but this could be optimized
+            console.log('Export libraries ready');
+        }
+
+        function optimizeRendering() {
+            // Use requestAnimationFrame for smooth updates
+            let ticking = false;
+
+            function updateUI() {
+                // Batch UI updates
+                updateCounters();
+                ticking = false;
+            }
+
+            function requestTick() {
+                if (!ticking) {
+                    requestAnimationFrame(updateUI);
+                    ticking = true;
+                }
+            }
+
+            // Throttle realtime updates
+            if (realtimeSubscription) {
+                let lastUpdate = Date.now();
+                const throttledUpdate = () => {
+                    const now = Date.now();
+                    if (now - lastUpdate > 1000) { // Max 1 update per second
+                        lastUpdate = now;
+                        requestTick();
+                    }
+                };
+
+                // Override the realtime callback
+                realtimeSubscription = supabase
+                    .channel('attendance_changes')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, throttledUpdate)
+                    .subscribe();
+            }
+        }
+
+        function initCacheManagement() {
+            // Cache student data locally
+            const studentCache = new Map();
+            const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+            // Store original matric input logic
+            window.originalHandleMatricInput = async function() {
+                const matric = matricInput.value.trim();
+                if (matric.length < 3 || !currentSchool) return;
+
+                // Check cache first
+                const cached = studentCache.get(matric);
+                if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
+                    performanceMetrics.cacheHits++;
+                    console.log('Cache hit for matric:', matric);
+                    displayStudentFromCache(cached.data);
+                    return;
+                }
+
+                // Fetch from API
+                performanceMetrics.apiCalls++;
+                const { data: student, error } = await supabase
+                    .from('students')
+                    .select('*')
+                    .eq('school_id', currentSchool.id)
+                    .eq('matric_number', matric)
+                    .single();
+
+                if (student) {
+                    // Cache the result
+                    studentCache.set(matric, {
+                        data: student,
+                        timestamp: Date.now()
+                    });
+                    displayStudentData(student);
+                } else {
+                    displayStudentNotFound();
+                }
+            };
+        }
+
+        function displayStudentFromCache(student) {
+            // Same logic as original handleMatricInput for cached data
+            studentNameInput.value = student.name;
+            document.getElementById('student-faculty').value = student.faculty || '';
+            document.getElementById('student-department').value = student.department || '';
+            document.getElementById('student-grade').value = student.grade || '';
+            document.getElementById('student-source').value = student.source || '';
+            document.getElementById('student-next-of-kin').value = student.next_of_kin || '';
+            phoneInput.value = student.phone || '';
+
+            // Check if already marked today
+            const today = new Date().toISOString().split('T')[0];
+            supabase
+                .from('attendance')
+                .select('ts, operators(name)')
+                .eq('school_id', currentSchool.id)
+                .eq('matric_number', matricInput.value.trim())
+                .eq('attendance_date', today)
+                .single()
+                .then(({ data: existingAttendance, error: attendanceError }) => {
+                    if (existingAttendance && !attendanceError) {
+                        const attendanceTime = new Date(existingAttendance.ts);
+                        const timeString = attendanceTime.toLocaleString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+
+                        document.getElementById('attendance-status').innerHTML = `
+                            <div class="status error">
+                                ⚠️ <strong>${student.name}</strong> already marked attendance today at ${timeString}
+                                ${existingAttendance.operators ? ` by ${existingAttendance.operators.name}` : ''}
+                            </div>
+                        `;
+                        document.getElementById('attendance-status').classList.remove('hidden');
+                        markBtn.disabled = true;
+                        markBtn.textContent = 'Already Marked Today';
+                    } else {
+                        document.getElementById('attendance-status').classList.add('hidden');
+                        markBtn.disabled = false;
+                        markBtn.textContent = 'Mark Attendance';
+                        phoneInput.focus();
+                    }
+                });
+
+            // Hide add student button
+            addStudentBtn.style.display = 'none';
+        }
+
+        function displayCachedStudent(student) {
+            // Same as displayStudentData but mark as cached
+            displayStudentData(student);
+            // Could add a small indicator that data is from cache
+        }
+
+        async function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('ServiceWorker registered:', registration);
+                } catch (error) {
+                    console.log('ServiceWorker registration failed:', error);
+                }
+            }
+        }
+
+        // Enhanced error handling
+        function initErrorHandling() {
+            window.addEventListener('error', (event) => {
+                performanceMetrics.errors++;
+                console.error('Global error:', event.error);
+
+                // Could send to error reporting service
+                logError(event.error, event.filename, event.lineno);
+            });
+
+            window.addEventListener('unhandledrejection', (event) => {
+                performanceMetrics.errors++;
+                console.error('Unhandled promise rejection:', event.reason);
+
+                logError(event.reason, 'promise', 'unhandled');
+            });
+        }
+
+        function logError(error, source, line) {
+            // In a real app, send to logging service
+            console.log(`Error logged: ${error} at ${source}:${line}`);
+        }
+
+        // Memory management
+        function initMemoryManagement() {
+            // Clean up event listeners on page unload
+            window.addEventListener('beforeunload', () => {
+                if (realtimeSubscription) {
+                    supabase.removeChannel(realtimeSubscription);
+                }
+            });
+
+            // Periodic cleanup
+            setInterval(() => {
+                // Force garbage collection hint (not guaranteed)
+                if (window.gc) window.gc();
+
+                // Clear old cache entries
+                performanceMetrics = {
+                    loadTime: performanceMetrics.loadTime,
+                    apiCalls: performanceMetrics.apiCalls,
+                    cacheHits: performanceMetrics.cacheHits,
+                    errors: performanceMetrics.errors
+                };
+            }, 300000); // Every 5 minutes
+        }
+
         // Initialize app
         async function init() {
             console.log('Initializing app...');
+
+            // Initialize performance monitoring
+            initConnectionMonitoring();
+            initPerformanceOptimizations();
+            initErrorHandling();
+            initMemoryManagement();
 
             // Check auth state
             const { data: { session }, error } = await supabase.auth.getSession();
@@ -1740,6 +2135,9 @@
 
             // Event listeners
             setupEventListeners();
+
+            // Log performance metrics
+            console.log('App initialized in', Date.now() - performanceMetrics.loadTime, 'ms');
         }
 
         async function handleAuthenticatedUser(user) {
@@ -1797,7 +2195,12 @@
 
             console.log('Updating header with:', displayName);
             document.querySelector('.operator-name').textContent = displayName;
-            document.querySelector('.operator-status').textContent = currentOperator.is_admin ? '● Admin' : '● Operator';
+
+            // Update status indicator
+            const statusIndicator = document.querySelector('.status-indicator');
+            const statusText = document.querySelector('.operator-status span');
+            statusIndicator.className = 'status-indicator online';
+            statusText.textContent = currentOperator.is_admin ? 'Admin' : 'Operator';
 
             // Show main app
             showMainApp();
@@ -1810,6 +2213,10 @@
 
             startRealtime();
             updateCounters();
+
+            // Update last sync time
+            lastSyncTime = new Date();
+            updateConnectionStatus();
         }
 
         function showAuthSection(section) {
@@ -1835,7 +2242,7 @@
 
             // Attendance form
             document.getElementById('attendance-form').addEventListener('submit', handleAttendanceSubmit);
-            matricInput.addEventListener('input', handleMatricInput);
+            // matricInput event listener is now set up in initPerformanceOptimizations with debouncing
             phoneInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -2093,6 +2500,7 @@
             realtimeSubscription = supabase
                 .channel('attendance_changes')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, () => {
+                    lastSyncTime = new Date();
                     updateCounters();
                 })
                 .subscribe();
