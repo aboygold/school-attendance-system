@@ -1330,7 +1330,11 @@
                 <div class="grid grid-3">
                     <button id="export-daily-csv-btn" class="btn-primary">Export Today's CSV</button>
                     <button id="export-daily-xlsx-btn" class="btn-primary">Export Today's XLSX</button>
+                    <button id="advanced-export-btn" class="btn-primary">Advanced Export</button>
+                </div>
+                <div class="grid grid-2" style="margin-top: 1rem;">
                     <button id="view-report-btn" class="btn-primary">View Report</button>
+                    <button id="export-templates-btn" class="btn-primary">Export Templates</button>
                 </div>
                 <div class="grid grid-2" style="margin-top: 1rem;">
                     <button id="clear-data-reports-btn" class="btn-danger">Clear All Data</button>
@@ -1358,6 +1362,126 @@
                 </div>
             </div>
         </section>
+
+        <!-- Advanced Export Modal -->
+        <div id="advanced-export-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Advanced Export</h3>
+                    <button class="modal-close" id="advanced-export-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="advanced-export-form">
+                        <!-- Date Range -->
+                        <div class="form-group">
+                            <label for="export-start-date">Start Date</label>
+                            <input type="date" id="export-start-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="export-end-date">End Date</label>
+                            <input type="date" id="export-end-date" required>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="card" style="margin: 1rem 0; padding: 1rem;">
+                            <h4 style="margin-bottom: 1rem; color: var(--accent-primary);">Filters (Optional)</h4>
+                            <div class="grid grid-2">
+                                <div class="form-group">
+                                    <label for="export-faculty">Faculty</label>
+                                    <select id="export-faculty">
+                                        <option value="">All Faculties</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="export-department">Department</label>
+                                    <select id="export-department">
+                                        <option value="">All Departments</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="export-grade">Grade</label>
+                                    <select id="export-grade">
+                                        <option value="">All Grades</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="export-operator">Operator</label>
+                                    <select id="export-operator">
+                                        <option value="">All Operators</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Export Options -->
+                        <div class="card" style="margin: 1rem 0; padding: 1rem;">
+                            <h4 style="margin-bottom: 1rem; color: var(--accent-primary);">Export Options</h4>
+                            <div class="grid grid-2">
+                                <div class="form-group">
+                                    <label for="export-format">Format</label>
+                                    <select id="export-format" required>
+                                        <option value="csv">CSV (Comma Separated)</option>
+                                        <option value="xlsx">Excel (XLSX)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="export-group-by">Group By</label>
+                                    <select id="export-group-by">
+                                        <option value="none">No Grouping</option>
+                                        <option value="faculty">Faculty</option>
+                                        <option value="department">Department</option>
+                                        <option value="grade">Grade</option>
+                                        <option value="operator">Operator</option>
+                                        <option value="date">Date</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 1rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="checkbox" id="export-include-summary" checked>
+                                    Include Summary Sheet
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="checkbox" id="export-anonymous">
+                                    Anonymous Export (Remove Personal Info)
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Generate Export</button>
+                    </form>
+                    <div id="advanced-export-status" class="hidden"></div>
+                    <div id="export-progress" class="hidden">
+                        <progress value="0" max="100" style="width: 100%; margin: 1rem 0;"></progress>
+                        <span id="export-progress-text">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Templates Modal -->
+        <div id="export-templates-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Export Templates</h3>
+                    <button class="modal-close" id="export-templates-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="margin-bottom: 1rem; color: var(--text-secondary);">Choose a pre-configured export template:</p>
+                    <div class="grid grid-2">
+                        <button class="btn-primary template-btn" data-template="daily-report">📊 Daily Report</button>
+                        <button class="btn-primary template-btn" data-template="weekly-summary">📈 Weekly Summary</button>
+                        <button class="btn-primary template-btn" data-template="faculty-report">🏛️ Faculty Report</button>
+                        <button class="btn-primary template-btn" data-template="operator-performance">👤 Operator Performance</button>
+                        <button class="btn-primary template-btn" data-template="absentee-list">❌ Absentee List</button>
+                        <button class="btn-primary template-btn" data-template="late-arrivals">⏰ Late Arrivals</button>
+                    </div>
+                    <div id="templates-status" class="hidden" style="margin-top: 1rem;"></div>
+                </div>
+            </div>
+        </div>
 
         <!-- Add Student Modal -->
         <div id="add-student-modal" class="modal hidden">
@@ -1549,6 +1673,19 @@
         const addStudentClose = document.getElementById('add-student-close');
         const addStudentStatus = document.getElementById('add-student-status');
 
+        // Advanced export elements
+        const advancedExportBtn = document.getElementById('advanced-export-btn');
+        const exportTemplatesBtn = document.getElementById('export-templates-btn');
+        const advancedExportModal = document.getElementById('advanced-export-modal');
+        const exportTemplatesModal = document.getElementById('export-templates-modal');
+        const advancedExportForm = document.getElementById('advanced-export-form');
+        const advancedExportClose = document.getElementById('advanced-export-close');
+        const exportTemplatesClose = document.getElementById('export-templates-close');
+        const advancedExportStatus = document.getElementById('advanced-export-status');
+        const exportProgress = document.getElementById('export-progress');
+        const exportProgressText = document.getElementById('export-progress-text');
+        const templateBtns = document.querySelectorAll('.template-btn');
+
         // Login elements
         const loginForm = document.getElementById('login-form');
         const signupForm = document.getElementById('signup-form');
@@ -1722,10 +1859,37 @@
             addStudentClose.addEventListener('click', hideAddStudentModal);
             addStudentForm.addEventListener('submit', handleAddStudent);
 
+            // Advanced export modal
+            advancedExportBtn.addEventListener('click', showAdvancedExportModal);
+            exportTemplatesBtn.addEventListener('click', showExportTemplatesModal);
+            advancedExportClose.addEventListener('click', hideAdvancedExportModal);
+            exportTemplatesClose.addEventListener('click', hideExportTemplatesModal);
+            advancedExportForm.addEventListener('submit', handleAdvancedExport);
+
+            // Template buttons
+            templateBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const template = e.target.dataset.template;
+                    exportTemplate(template);
+                });
+            });
+
             // Close modal when clicking outside
             addStudentModal.addEventListener('click', (e) => {
                 if (e.target.id === 'add-student-modal') {
                     hideAddStudentModal();
+                }
+            });
+
+            advancedExportModal.addEventListener('click', (e) => {
+                if (e.target.id === 'advanced-export-modal') {
+                    hideAdvancedExportModal();
+                }
+            });
+
+            exportTemplatesModal.addEventListener('click', (e) => {
+                if (e.target.id === 'export-templates-modal') {
+                    hideExportTemplatesModal();
                 }
             });
 
@@ -2646,6 +2810,319 @@
             addStudentStatus.className = `status ${type}`;
             addStudentStatus.classList.remove('hidden');
             setTimeout(() => addStudentStatus.classList.add('hidden'), 5000);
+        }
+
+        // Advanced Export Functions
+        function showAdvancedExportModal() {
+            // Set default date range (last 7 days)
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - 7);
+
+            document.getElementById('export-start-date').value = startDate.toISOString().split('T')[0];
+            document.getElementById('export-end-date').value = endDate.toISOString().split('T')[0];
+
+            // Load filter options
+            loadExportFilters();
+
+            advancedExportModal.classList.remove('hidden');
+        }
+
+        function hideAdvancedExportModal() {
+            advancedExportModal.classList.add('hidden');
+            advancedExportForm.reset();
+            advancedExportStatus.classList.add('hidden');
+            exportProgress.classList.add('hidden');
+        }
+
+        function showExportTemplatesModal() {
+            exportTemplatesModal.classList.remove('hidden');
+        }
+
+        function hideExportTemplatesModal() {
+            exportTemplatesModal.classList.add('hidden');
+            document.getElementById('templates-status').classList.add('hidden');
+        }
+
+        async function loadExportFilters() {
+            try {
+                // Load faculties
+                const { data: faculties } = await supabase
+                    .from('students')
+                    .select('faculty')
+                    .eq('school_id', currentSchool.id);
+
+                const facultySelect = document.getElementById('export-faculty');
+                const uniqueFaculties = [...new Set(faculties.map(f => f.faculty).filter(f => f))];
+                facultySelect.innerHTML = '<option value="">All Faculties</option>';
+                uniqueFaculties.forEach(faculty => {
+                    facultySelect.innerHTML += `<option value="${faculty}">${faculty}</option>`;
+                });
+
+                // Load departments
+                const { data: departments } = await supabase
+                    .from('students')
+                    .select('department')
+                    .eq('school_id', currentSchool.id);
+
+                const deptSelect = document.getElementById('export-department');
+                const uniqueDepts = [...new Set(departments.map(d => d.department).filter(d => d))];
+                deptSelect.innerHTML = '<option value="">All Departments</option>';
+                uniqueDepts.forEach(dept => {
+                    deptSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
+                });
+
+                // Load grades
+                const { data: grades } = await supabase
+                    .from('students')
+                    .select('grade')
+                    .eq('school_id', currentSchool.id);
+
+                const gradeSelect = document.getElementById('export-grade');
+                const uniqueGrades = [...new Set(grades.map(g => g.grade).filter(g => g))];
+                gradeSelect.innerHTML = '<option value="">All Grades</option>';
+                uniqueGrades.forEach(grade => {
+                    gradeSelect.innerHTML += `<option value="${grade}">${grade}</option>`;
+                });
+
+                // Load operators
+                const { data: operators } = await supabase
+                    .from('operators')
+                    .select('id, name')
+                    .eq('school_id', currentSchool.id);
+
+                const operatorSelect = document.getElementById('export-operator');
+                operatorSelect.innerHTML = '<option value="">All Operators</option>';
+                operators.forEach(op => {
+                    operatorSelect.innerHTML += `<option value="${op.id}">${op.name}</option>`;
+                });
+
+            } catch (error) {
+                console.error('Error loading export filters:', error);
+            }
+        }
+
+        async function handleAdvancedExport(e) {
+            e.preventDefault();
+
+            const startDate = document.getElementById('export-start-date').value;
+            const endDate = document.getElementById('export-end-date').value;
+            const faculty = document.getElementById('export-faculty').value;
+            const department = document.getElementById('export-department').value;
+            const grade = document.getElementById('export-grade').value;
+            const operator = document.getElementById('export-operator').value;
+            const format = document.getElementById('export-format').value;
+            const groupBy = document.getElementById('export-group-by').value;
+            const includeSummary = document.getElementById('export-include-summary').checked;
+            const anonymous = document.getElementById('export-anonymous').checked;
+
+            if (!startDate || !endDate) {
+                showAdvancedExportStatus('Please select date range.', 'error');
+                return;
+            }
+
+            exportProgress.classList.remove('hidden');
+            exportProgressText.textContent = 'Fetching data...';
+
+            try {
+                // Build query
+                let query = supabase
+                    .from('attendance')
+                    .select(`
+                        matric_number,
+                        attendance_date,
+                        ts,
+                        phone_captured,
+                        notes,
+                        students!inner(name, faculty, department, grade, source, next_of_kin, phone),
+                        operators(name, username)
+                    `)
+                    .eq('school_id', currentSchool.id)
+                    .gte('attendance_date', startDate)
+                    .lte('attendance_date', endDate)
+                    .order('attendance_date', { ascending: false })
+                    .order('ts', { ascending: false });
+
+                // Apply filters
+                if (faculty) {
+                    query = query.eq('students.faculty', faculty);
+                }
+                if (department) {
+                    query = query.eq('students.department', department);
+                }
+                if (grade) {
+                    query = query.eq('students.grade', grade);
+                }
+                if (operator) {
+                    query = query.eq('operator_id', operator);
+                }
+
+                exportProgressText.textContent = 'Processing data...';
+                const { data: attendance, error } = await query;
+
+                if (error) throw error;
+
+                exportProgressText.textContent = 'Generating export...';
+
+                // Process data
+                let processedData = attendance.map(record => ({
+                    Date: record.attendance_date,
+                    Time: new Date(record.ts).toLocaleString(),
+                    'Matric Number': record.matric_number,
+                    'Student Name': anonymous ? 'Anonymous' : record.students.name,
+                    Faculty: record.students.faculty || '',
+                    Department: record.students.department || '',
+                    Grade: record.students.grade || '',
+                    Source: record.students.source || '',
+                    'Next of Kin': anonymous ? '' : record.students.next_of_kin || '',
+                    'Student Phone': anonymous ? '' : record.students.phone || '',
+                    'Captured Phone': record.phone_captured || '',
+                    Operator: record.operators?.name || 'Unknown',
+                    'Operator Username': record.operators?.username || '',
+                    Notes: record.notes || ''
+                }));
+
+                // Group data if requested
+                if (groupBy !== 'none') {
+                    processedData = groupDataBy(processedData, groupBy);
+                }
+
+                // Generate export based on format
+                const filename = `attendance_export_${startDate}_to_${endDate}`;
+
+                if (format === 'csv') {
+                    exportToCSV(processedData, filename);
+                } else if (format === 'xlsx') {
+                    exportToXLSX(processedData, filename, includeSummary, startDate, endDate);
+                }
+
+                exportProgressText.textContent = 'Export completed!';
+                setTimeout(() => {
+                    hideAdvancedExportModal();
+                }, 2000);
+
+            } catch (error) {
+                console.error('Advanced export error:', error);
+                showAdvancedExportStatus('Export failed: ' + error.message, 'error');
+                exportProgress.classList.add('hidden');
+            }
+        }
+
+        function groupDataBy(data, groupBy) {
+            const groups = {};
+            data.forEach(record => {
+                const key = record[groupBy.charAt(0).toUpperCase() + groupBy.slice(1)] || 'Unknown';
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(record);
+            });
+
+            const result = [];
+            Object.keys(groups).sort().forEach(key => {
+                result.push({ [groupBy.toUpperCase()]: key, '': '' });
+                result.push(...groups[key]);
+                result.push({ '': '', 'TOTAL': groups[key].length + ' records' });
+            });
+
+            return result;
+        }
+
+        function exportToCSV(data, filename) {
+            const csv = [Object.keys(data[0]).join(',')];
+            data.forEach(row => {
+                csv.push(Object.values(row).map(v => `"${v}"`).join(','));
+            });
+            downloadFile(csv.join('\n'), `${filename}.csv`, 'text/csv');
+        }
+
+        function exportToXLSX(data, filename, includeSummary, startDate, endDate) {
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Attendance Data');
+
+            if (includeSummary) {
+                const summaryData = generateSummaryData(data, startDate, endDate);
+                const summaryWs = XLSX.utils.json_to_sheet(summaryData);
+                XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary');
+            }
+
+            XLSX.writeFile(wb, `${filename}.xlsx`);
+        }
+
+        function generateSummaryData(data, startDate, endDate) {
+            const summary = {
+                'Report Period': `${startDate} to ${endDate}`,
+                'Total Records': data.length,
+                'Unique Students': [...new Set(data.map(r => r['Matric Number']))].length,
+                'Date Range': `${Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24))} days`
+            };
+
+            // Faculty breakdown
+            const facultyStats = {};
+            data.forEach(record => {
+                const faculty = record.Faculty || 'Unknown';
+                facultyStats[faculty] = (facultyStats[faculty] || 0) + 1;
+            });
+
+            summary['Faculty Breakdown'] = Object.entries(facultyStats)
+                .map(([faculty, count]) => `${faculty}: ${count}`)
+                .join(', ');
+
+            return [summary];
+        }
+
+        async function exportTemplate(templateType) {
+            const today = new Date().toISOString().split('T')[0];
+            let startDate, endDate, filters = {};
+
+            switch (templateType) {
+                case 'daily-report':
+                    startDate = endDate = today;
+                    break;
+                case 'weekly-summary':
+                    endDate = today;
+                    startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                    break;
+                case 'faculty-report':
+                    endDate = today;
+                    startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                    break;
+                case 'operator-performance':
+                    endDate = today;
+                    startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                    break;
+                case 'absentee-list':
+                    startDate = endDate = today;
+                    break;
+                case 'late-arrivals':
+                    startDate = endDate = today;
+                    break;
+            }
+
+            // Set form values
+            document.getElementById('export-start-date').value = startDate;
+            document.getElementById('export-end-date').value = endDate;
+            document.getElementById('export-format').value = 'xlsx';
+            document.getElementById('export-group-by').value = templateType.includes('faculty') ? 'faculty' :
+                                                             templateType.includes('operator') ? 'operator' : 'none';
+            document.getElementById('export-include-summary').checked = true;
+
+            // Hide templates modal and show advanced export
+            hideExportTemplatesModal();
+            showAdvancedExportModal();
+
+            // Show status
+            const statusEl = document.getElementById('templates-status');
+            statusEl.textContent = `Template "${templateType.replace('-', ' ')}" loaded. Configure additional options and click "Generate Export".`;
+            statusEl.className = 'status success';
+            statusEl.classList.remove('hidden');
+            setTimeout(() => statusEl.classList.add('hidden'), 3000);
+        }
+
+        function showAdvancedExportStatus(message, type) {
+            advancedExportStatus.textContent = message;
+            advancedExportStatus.className = `status ${type}`;
+            advancedExportStatus.classList.remove('hidden');
+            setTimeout(() => advancedExportStatus.classList.add('hidden'), 5000);
         }
 
         // Initialize
