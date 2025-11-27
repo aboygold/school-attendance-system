@@ -12,9 +12,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="dns-prefetch" href="https://sjrhljtjgxjohkipxaky.supabase.co">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" as="script" crossorigin>
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" as="script" crossorigin>
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script" crossorigin>
     <style>
         :root {
             /* Dark Theme Color Palette */
@@ -216,50 +213,9 @@
         }
 
         .operator-status {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
             font-size: 0.75rem;
+            color: var(--accent-success);
             font-weight: 500;
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            position: relative;
-        }
-
-        .status-indicator.online {
-            background: var(--accent-success);
-            box-shadow: 0 0 6px var(--accent-success);
-            animation: pulse 2s infinite;
-        }
-
-        .status-indicator.offline {
-            background: var(--accent-error);
-        }
-
-        .status-indicator.slow {
-            background: var(--accent-warning);
-            animation: blink 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 6px var(--accent-success); }
-            50% { box-shadow: 0 0 12px var(--accent-success), 0 0 24px var(--accent-success); }
-            100% { box-shadow: 0 0 6px var(--accent-success); }
-        }
-
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0.3; }
-        }
-
-        .connection-info {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
         }
 
         /* Navigation */
@@ -1001,69 +957,6 @@
             font-weight: 500;
         }
 
-        /* Loading Screen */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--primary-bg), var(--secondary-bg));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .loading-content {
-            text-align: center;
-            color: var(--text-primary);
-        }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid var(--border-color);
-            border-top: 4px solid var(--accent-primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 2rem;
-        }
-
-        .loading-content h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .loading-content p {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-        }
-
-        .loading-progress {
-            width: 300px;
-            height: 4px;
-            background: var(--secondary-bg);
-            border-radius: 2px;
-            overflow: hidden;
-            margin: 0 auto;
-        }
-
-        .loading-bar {
-            height: 100%;
-            background: var(--gradient-primary);
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 2px;
-        }
-
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -1206,19 +1099,7 @@
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="loading-screen">
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <h2>School Attendance System</h2>
-            <p>Loading...</p>
-            <div class="loading-progress">
-                <div class="loading-bar" id="loading-bar"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="container" id="main-container" style="display: none;">
+    <div class="container">
         <header>
             <div class="brand-section">
                 <div class="logo-container">
@@ -1242,11 +1123,7 @@
                 </div>
                 <div class="operator-info">
                     <div class="operator-name">Not logged in</div>
-                    <div class="operator-status">
-                        <div class="status-indicator offline"></div>
-                        <span>Offline</span>
-                    </div>
-                    <div class="connection-info" id="connection-info">No connection</div>
+                    <div class="operator-status">● Offline</div>
                     <button id="shortcuts-btn" class="shortcuts-btn" title="Keyboard Shortcuts (F1)">⌨️</button>
                 </div>
             </div>
@@ -1453,11 +1330,7 @@
                 <div class="grid grid-3">
                     <button id="export-daily-csv-btn" class="btn-primary">Export Today's CSV</button>
                     <button id="export-daily-xlsx-btn" class="btn-primary">Export Today's XLSX</button>
-                    <button id="advanced-export-btn" class="btn-primary">Advanced Export</button>
-                </div>
-                <div class="grid grid-2" style="margin-top: 1rem;">
                     <button id="view-report-btn" class="btn-primary">View Report</button>
-                    <button id="export-templates-btn" class="btn-primary">Export Templates</button>
                 </div>
                 <div class="grid grid-2" style="margin-top: 1rem;">
                     <button id="clear-data-reports-btn" class="btn-danger">Clear All Data</button>
@@ -1485,145 +1358,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- Advanced Export Modal -->
-        <div id="advanced-export-modal" class="modal hidden">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Advanced Export</h3>
-                    <button class="modal-close" id="advanced-export-close">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form id="advanced-export-form">
-                        <!-- Date Range -->
-                        <div class="form-group">
-                            <label for="export-start-date">Start Date</label>
-                            <input type="date" id="export-start-date" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="export-end-date">End Date</label>
-                            <input type="date" id="export-end-date" required>
-                        </div>
-
-                        <!-- Filters -->
-                        <div class="card" style="margin: 1rem 0; padding: 1rem;">
-                            <h4 style="margin-bottom: 1rem; color: var(--accent-primary);">Filters (Optional)</h4>
-                            <div class="grid grid-2">
-                                <div class="form-group">
-                                    <label for="export-faculty">Faculty</label>
-                                    <select id="export-faculty">
-                                        <option value="">All Faculties</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="export-department">Department</label>
-                                    <select id="export-department">
-                                        <option value="">All Departments</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="export-grade">Grade</label>
-                                    <select id="export-grade">
-                                        <option value="">All Grades</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="export-operator">Operator</label>
-                                    <select id="export-operator">
-                                        <option value="">All Operators</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Export Options -->
-                        <div class="card" style="margin: 1rem 0; padding: 1rem;">
-                            <h4 style="margin-bottom: 1rem; color: var(--accent-primary);">Export Options</h4>
-                            <div class="form-group">
-                                <label for="export-format">Format</label>
-                                <select id="export-format" required>
-                                    <option value="csv">CSV (Comma Separated)</option>
-                                    <option value="xlsx">Excel (XLSX)</option>
-                                    <option value="pdf">PDF Document</option>
-                                    <option value="json">JSON Data</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="export-group-by">Group By</label>
-                                <select id="export-group-by">
-                                    <option value="none">No Grouping</option>
-                                    <option value="date">By Date</option>
-                                    <option value="faculty">By Faculty</option>
-                                    <option value="department">By Department</option>
-                                    <option value="grade">By Grade</option>
-                                    <option value="operator">By Operator</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>
-                                    <input type="checkbox" id="export-include-summary"> Include Summary Sheet
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label>
-                                    <input type="checkbox" id="export-anonymous" checked> Anonymize Student Data
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="grid grid-2">
-                            <button type="submit" class="btn-primary">Generate Export</button>
-                            <button type="button" id="schedule-export-btn" class="btn-primary">Schedule Export</button>
-                        </div>
-                    </form>
-                    <div id="advanced-export-status" class="hidden"></div>
-                    <div id="export-progress" class="hidden" style="margin-top: 1rem;">
-                        <progress value="0" max="100" style="width: 100%;"></progress>
-                        <span id="export-progress-text">Preparing export...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Export Templates Modal -->
-        <div id="export-templates-modal" class="modal hidden">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Export Templates</h3>
-                    <button class="modal-close" id="export-templates-close">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="grid grid-2">
-                        <div class="card" style="cursor: pointer;" onclick="exportTemplate('daily-report')">
-                            <h4>📊 Daily Report</h4>
-                            <p>Complete daily attendance with student details</p>
-                        </div>
-                        <div class="card" style="cursor: pointer;" onclick="exportTemplate('weekly-summary')">
-                            <h4>📈 Weekly Summary</h4>
-                            <p>Weekly attendance statistics and trends</p>
-                        </div>
-                        <div class="card" style="cursor: pointer;" onclick="exportTemplate('faculty-report')">
-                            <h4>🏫 Faculty Report</h4>
-                            <p>Attendance breakdown by faculty and department</p>
-                        </div>
-                        <div class="card" style="cursor: pointer;" onclick="exportTemplate('operator-performance')">
-                            <h4>👤 Operator Performance</h4>
-                            <p>Operator activity and performance metrics</p>
-                        </div>
-                        <div class="card" style="cursor: pointer;" onclick="exportTemplate('absentee-list')">
-                            <h4>❌ Absentee List</h4>
-                            <p>List of students not marked present</p>
-                        </div>
-                        <div class="card" style="cursor: pointer;" onclick="exportTemplate('late-arrivals')">
-                            <h4>⏰ Late Arrivals</h4>
-                            <p>Students marked after specified time</p>
-                        </div>
-                    </div>
-                    <div id="templates-status" class="hidden" style="margin-top: 1rem;"></div>
-                </div>
-            </div>
-        </div>
 
         <!-- Add Student Modal -->
         <div id="add-student-modal" class="modal hidden">
@@ -1782,8 +1516,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script>
         // Supabase client setup
         const SUPABASE_URL = 'https://sjrhljtjgxjohkipxaky.supabase.co';
@@ -1796,29 +1528,6 @@
         let currentOperator = null;
         let currentSchool = { id: '550e8400-e29b-41d4-a716-446655440001', name: 'University of Lagos' };
         let realtimeSubscription = null;
-
-        // Performance and connection monitoring
-        let connectionStatus = 'offline';
-        let lastSyncTime = null;
-        let networkSpeed = 'unknown';
-        let connectionQuality = 'poor';
-        let performanceMetrics = {
-            loadTime: Date.now(),
-            apiCalls: 0,
-            cacheHits: 0,
-            errors: 0
-        };
-
-        // Offline attendance queue
-        let offlineAttendanceQueue = [];
-        let isProcessingQueue = false;
-        const ATTENDANCE_QUEUE_KEY = 'attendance_queue';
-        const STUDENT_CACHE_KEY = 'student_cache';
-        const OFFLINE_STUDENTS_KEY = 'offline_students';
-
-        // Pre-cache critical data
-        let criticalDataLoaded = false;
-        let allStudentsCache = new Map();
 
         // DOM elements
         const matricInput = document.getElementById('matric-input');
@@ -1840,19 +1549,6 @@
         const addStudentClose = document.getElementById('add-student-close');
         const addStudentStatus = document.getElementById('add-student-status');
 
-        // Advanced export elements
-        const advancedExportBtn = document.getElementById('advanced-export-btn');
-        const exportTemplatesBtn = document.getElementById('export-templates-btn');
-        const advancedExportModal = document.getElementById('advanced-export-modal');
-        const exportTemplatesModal = document.getElementById('export-templates-modal');
-        const advancedExportForm = document.getElementById('advanced-export-form');
-        const advancedExportClose = document.getElementById('advanced-export-close');
-        const exportTemplatesClose = document.getElementById('export-templates-close');
-        const advancedExportStatus = document.getElementById('advanced-export-status');
-        const exportProgress = document.getElementById('export-progress');
-        const exportProgressText = document.getElementById('export-progress-text');
-        const scheduleExportBtn = document.getElementById('schedule-export-btn');
-
         // Login elements
         const loginForm = document.getElementById('login-form');
         const signupForm = document.getElementById('signup-form');
@@ -1868,630 +1564,24 @@
         const showLoginBtn = document.getElementById('show-login');
         const mainNav = document.getElementById('main-nav');
 
-        // Offline Storage and Fast Loading Functions
-        function initOfflineStorage() {
-            // Load offline queue from storage
-            loadOfflineQueue();
-
-            // Load cached students
-            loadStudentCache();
-
-            // Pre-cache critical data when online
-            if (navigator.onLine) {
-                preCacheCriticalData();
-            }
-        }
-
-        async function loadOfflineQueue() {
-            try {
-                const stored = localStorage.getItem(ATTENDANCE_QUEUE_KEY);
-                if (stored) {
-                    offlineAttendanceQueue = JSON.parse(stored);
-                    console.log('Loaded', offlineAttendanceQueue.length, 'offline attendance records');
-                }
-            } catch (error) {
-                console.error('Error loading offline queue:', error);
-                offlineAttendanceQueue = [];
-            }
-        }
-
-        async function saveOfflineQueue() {
-            try {
-                localStorage.setItem(ATTENDANCE_QUEUE_KEY, JSON.stringify(offlineAttendanceQueue));
-            } catch (error) {
-                console.error('Error saving offline queue:', error);
-            }
-        }
-
-        async function loadStudentCache() {
-            try {
-                const stored = localStorage.getItem(STUDENT_CACHE_KEY);
-                if (stored) {
-                    const cache = JSON.parse(stored);
-                    // Convert back to Map
-                    Object.entries(cache).forEach(([key, value]) => {
-                        allStudentsCache.set(key, value);
-                    });
-                    console.log('Loaded', allStudentsCache.size, 'cached students');
-                }
-            } catch (error) {
-                console.error('Error loading student cache:', error);
-                allStudentsCache.clear();
-            }
-        }
-
-        async function saveStudentCache() {
-            try {
-                // Convert Map to object for storage
-                const cacheObj = {};
-                allStudentsCache.forEach((value, key) => {
-                    cacheObj[key] = value;
-                });
-                localStorage.setItem(STUDENT_CACHE_KEY, JSON.stringify(cacheObj));
-            } catch (error) {
-                console.error('Error saving student cache:', error);
-            }
-        }
-
-        async function preCacheCriticalData() {
-            if (criticalDataLoaded) return;
-
-            try {
-                console.log('Pre-caching critical data...');
-
-                // Cache all students for the school
-                if (currentSchool) {
-                    const { data: students, error } = await supabase
-                        .from('students')
-                        .select('matric_number, name, faculty, department, grade, source, next_of_kin, phone')
-                        .eq('school_id', currentSchool.id);
-
-                    if (!error && students) {
-                        students.forEach(student => {
-                            allStudentsCache.set(student.matric_number, {
-                                ...student,
-                                cachedAt: Date.now()
-                            });
-                        });
-                        await saveStudentCache();
-                        console.log('Pre-cached', students.length, 'students');
-                    }
-                }
-
-                criticalDataLoaded = true;
-            } catch (error) {
-                console.error('Error pre-caching data:', error);
-            }
-        }
-
-        async function markAttendanceOffline(matric, phone, notes) {
-            const attendanceRecord = {
-                id: 'offline_' + Date.now() + '_' + Math.random(),
-                matric_number: matric,
-                phone_captured: phone,
-                notes: notes,
-                attendance_date: new Date().toISOString().split('T')[0],
-                ts: new Date().toISOString(),
-                operator_id: currentOperator?.id,
-                school_id: currentSchool?.id,
-                createdAt: Date.now(),
-                synced: false
-            };
-
-            offlineAttendanceQueue.push(attendanceRecord);
-            await saveOfflineQueue();
-
-            console.log('Attendance marked offline:', attendanceRecord);
-            return attendanceRecord;
-        }
-
-        async function syncOfflineAttendance() {
-            if (isProcessingQueue || offlineAttendanceQueue.length === 0 || !navigator.onLine) {
-                return;
-            }
-
-            isProcessingQueue = true;
-            console.log('Starting offline sync, queue length:', offlineAttendanceQueue.length);
-
-            const queueCopy = [...offlineAttendanceQueue];
-            let successCount = 0;
-            let errorCount = 0;
-
-            for (const record of queueCopy) {
-                try {
-                    // Check if already synced
-                    if (record.synced) continue;
-
-                    const { data, error } = await supabase.rpc('mark_attendance', {
-                        p_school_id: record.school_id,
-                        p_matric: record.matric_number,
-                        p_date: record.attendance_date,
-                        p_operator_id: record.operator_id,
-                        p_phone: record.phone_captured || null,
-                        p_notes: record.notes || null
-                    });
-
-                    if (error) throw error;
-
-                    // Mark as synced
-                    record.synced = true;
-                    record.syncedAt = Date.now();
-                    successCount++;
-
-                    console.log('Synced offline record:', record.matric_number);
-
-                } catch (error) {
-                    console.error('Error syncing record:', record.matric_number, error);
-                    errorCount++;
-
-                    // If it's a duplicate, mark as synced anyway
-                    if (error.message?.includes('already exists') || error.code === '23505') {
-                        record.synced = true;
-                        record.syncedAt = Date.now();
-                        successCount++;
-                    }
-                }
-            }
-
-            // Update queue
-            offlineAttendanceQueue = offlineAttendanceQueue.filter(record => !record.synced);
-            await saveOfflineQueue();
-
-            console.log(`Sync completed: ${successCount} success, ${errorCount} errors`);
-
-            // Update UI
-            if (successCount > 0) {
-                updateCounters();
-                loadDashboardData();
-            }
-
-            isProcessingQueue = false;
-
-            // Show sync status
-            if (successCount > 0) {
-                showStatus(`✅ Synced ${successCount} offline attendance records!`, 'success');
-            }
-        }
-
-        // Performance and Connection Monitoring
-        function initConnectionMonitoring() {
-            // Monitor online/offline status
-            window.addEventListener('online', updateConnectionStatus);
-            window.addEventListener('offline', updateConnectionStatus);
-
-            // Monitor network speed
-            measureNetworkSpeed();
-
-            // Initial status update
-            updateConnectionStatus();
-
-            // Periodic connection checks
-            setInterval(updateConnectionStatus, 30000); // Every 30 seconds
-            setInterval(measureNetworkSpeed, 60000); // Every minute
-        }
-
-        function updateConnectionStatus() {
-            const wasOffline = connectionStatus === 'offline';
-            const isOnline = navigator.onLine;
-            const indicator = document.querySelector('.status-indicator');
-            const statusText = document.querySelector('.operator-status span');
-            const connectionInfo = document.getElementById('connection-info');
-
-            if (isOnline) {
-                connectionStatus = 'online';
-                indicator.className = 'status-indicator online';
-                statusText.textContent = 'Online';
-
-                // Test actual connectivity
-                testConnectivity().then(connected => {
-                    if (!connected) {
-                        connectionStatus = 'slow';
-                        indicator.className = 'status-indicator slow';
-                        statusText.textContent = 'Slow Connection';
-                    } else {
-                        // Connection restored - sync offline data
-                        if (wasOffline && offlineAttendanceQueue.length > 0) {
-                            console.log('Connection restored, syncing offline data...');
-                            syncOfflineAttendance();
-                        }
-                    }
-                });
-            } else {
-                connectionStatus = 'offline';
-                indicator.className = 'status-indicator offline';
-                statusText.textContent = 'Offline';
-            }
-
-            // Update connection info
-            const lastSync = lastSyncTime ? new Date(lastSyncTime).toLocaleTimeString() : 'Never';
-            const queueInfo = offlineAttendanceQueue.length > 0 ? ` | ${offlineAttendanceQueue.length} pending` : '';
-            connectionInfo.textContent = `Last sync: ${lastSync} | ${connectionQuality} connection${queueInfo}`;
-        }
-
-        async function testConnectivity() {
-            try {
-                const start = Date.now();
-                const response = await fetch('https://www.google.com/favicon.ico', {
-                    method: 'HEAD',
-                    cache: 'no-cache'
-                });
-                const end = Date.now();
-                const latency = end - start;
-
-                if (latency < 100) connectionQuality = 'excellent';
-                else if (latency < 300) connectionQuality = 'good';
-                else if (latency < 1000) connectionQuality = 'fair';
-                else connectionQuality = 'poor';
-
-                return response.ok;
-            } catch (error) {
-                connectionQuality = 'poor';
-                return false;
-            }
-        }
-
-        async function measureNetworkSpeed() {
-            try {
-                const start = Date.now();
-                const response = await fetch('https://httpbin.org/get?size=1024', {
-                    method: 'GET',
-                    cache: 'no-cache'
-                });
-                const end = Date.now();
-                const duration = (end - start) / 1000; // seconds
-                const speedMbps = (1024 * 8) / (duration * 1000000); // Rough calculation
-
-                if (speedMbps > 10) networkSpeed = 'fast';
-                else if (speedMbps > 1) networkSpeed = 'medium';
-                else networkSpeed = 'slow';
-            } catch (error) {
-                networkSpeed = 'unknown';
-            }
-        }
-
-        // Performance Optimizations
-        function initPerformanceOptimizations() {
-            // Cache management (must be initialized first)
-            initCacheManagement();
-
-            // Debounce matric input for better performance
-            const debouncedMatricInput = debounce(window.originalHandleMatricInput, 300);
-            matricInput.addEventListener('input', debouncedMatricInput);
-
-            // Lazy load heavy components
-            lazyLoadComponents();
-
-            // Optimize rendering
-            optimizeRendering();
-
-            // Service worker for offline capability
-            registerServiceWorker();
-        }
-
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-
-        function lazyLoadComponents() {
-            // Lazy load export functionality
-            const exportObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        // Load export scripts when needed
-                        loadExportLibraries();
-                        exportObserver.disconnect();
-                    }
-                });
-            });
-
-            const reportsSection = document.getElementById('reports');
-            if (reportsSection) {
-                exportObserver.observe(reportsSection);
-            }
-        }
-
-        function loadExportLibraries() {
-            // Libraries are already loaded, but this could be optimized
-            console.log('Export libraries ready');
-        }
-
-        function optimizeRendering() {
-            // Use requestAnimationFrame for smooth updates
-            let ticking = false;
-
-            function updateUI() {
-                // Batch UI updates
-                updateCounters();
-                ticking = false;
-            }
-
-            function requestTick() {
-                if (!ticking) {
-                    requestAnimationFrame(updateUI);
-                    ticking = true;
-                }
-            }
-
-            // Throttle realtime updates
-            if (realtimeSubscription) {
-                let lastUpdate = Date.now();
-                const throttledUpdate = () => {
-                    const now = Date.now();
-                    if (now - lastUpdate > 1000) { // Max 1 update per second
-                        lastUpdate = now;
-                        requestTick();
-                    }
-                };
-
-                // Override the realtime callback
-                realtimeSubscription = supabase
-                    .channel('attendance_changes')
-                    .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, throttledUpdate)
-                    .subscribe();
-            }
-        }
-
-        function initCacheManagement() {
-            // Cache student data locally
-            const studentCache = new Map();
-            const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
-            // Store original matric input logic
-            window.originalHandleMatricInput = async function() {
-                const matric = matricInput.value.trim();
-                if (matric.length < 3 || !currentSchool) return;
-
-                // Check pre-cached data first (instant)
-                const preCached = allStudentsCache.get(matric);
-                if (preCached) {
-                    performanceMetrics.cacheHits++;
-                    console.log('Pre-cache hit for matric:', matric);
-                    displayStudentData(preCached);
-                    return;
-                }
-
-                // Check session cache
-                const cached = studentCache.get(matric);
-                if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
-                    performanceMetrics.cacheHits++;
-                    console.log('Session cache hit for matric:', matric);
-                    displayStudentFromCache(cached.data);
-                    return;
-                }
-
-                // Fetch from API
-                performanceMetrics.apiCalls++;
-                const { data: student, error } = await supabase
-                    .from('students')
-                    .select('*')
-                    .eq('school_id', currentSchool.id)
-                    .eq('matric_number', matric)
-                    .single();
-
-                if (student) {
-                    // Cache the result
-                    studentCache.set(matric, {
-                        data: student,
-                        timestamp: Date.now()
-                    });
-                    displayStudentData(student);
-                } else {
-                    displayStudentNotFound();
-                }
-            };
-        }
-
-        function displayStudentFromCache(student) {
-            // Same logic as original handleMatricInput for cached data
-            studentNameInput.value = student.name;
-            document.getElementById('student-faculty').value = student.faculty || '';
-            document.getElementById('student-department').value = student.department || '';
-            document.getElementById('student-grade').value = student.grade || '';
-            document.getElementById('student-source').value = student.source || '';
-            document.getElementById('student-next-of-kin').value = student.next_of_kin || '';
-            phoneInput.value = student.phone || '';
-
-            // Check if already marked today
-            const today = new Date().toISOString().split('T')[0];
-            supabase
-                .from('attendance')
-                .select('ts, operators(name)')
-                .eq('school_id', currentSchool.id)
-                .eq('matric_number', matricInput.value.trim())
-                .eq('attendance_date', today)
-                .single()
-                .then(({ data: existingAttendance, error: attendanceError }) => {
-                    if (existingAttendance && !attendanceError) {
-                        const attendanceTime = new Date(existingAttendance.ts);
-                        const timeString = attendanceTime.toLocaleString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                        });
-
-                        document.getElementById('attendance-status').innerHTML = `
-                            <div class="status error">
-                                ⚠️ <strong>${student.name}</strong> already marked attendance today at ${timeString}
-                                ${existingAttendance.operators ? ` by ${existingAttendance.operators.name}` : ''}
-                            </div>
-                        `;
-                        document.getElementById('attendance-status').classList.remove('hidden');
-                        markBtn.disabled = true;
-                        markBtn.textContent = 'Already Marked Today';
-                    } else {
-                        document.getElementById('attendance-status').classList.add('hidden');
-                        markBtn.disabled = false;
-                        markBtn.textContent = 'Mark Attendance';
-                        phoneInput.focus();
-                    }
-                });
-
-            // Hide add student button
-            addStudentBtn.style.display = 'none';
-        }
-
-        function displayCachedStudent(student) {
-            // Same as displayStudentData but mark as cached
-            displayStudentData(student);
-            // Could add a small indicator that data is from cache
-        }
-
-        async function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                try {
-                    const registration = await navigator.serviceWorker.register('/sw.js');
-                    console.log('ServiceWorker registered:', registration);
-                } catch (error) {
-                    console.log('ServiceWorker registration failed:', error);
-                }
-            }
-        }
-
-        // Enhanced error handling
-        function initErrorHandling() {
-            window.addEventListener('error', (event) => {
-                performanceMetrics.errors++;
-                console.error('Global error:', event.error);
-
-                // Could send to error reporting service
-                logError(event.error, event.filename, event.lineno);
-            });
-
-            window.addEventListener('unhandledrejection', (event) => {
-                performanceMetrics.errors++;
-                console.error('Unhandled promise rejection:', event.reason);
-
-                logError(event.reason, 'promise', 'unhandled');
-            });
-        }
-
-        function logError(error, source, line) {
-            // In a real app, send to logging service
-            console.log(`Error logged: ${error} at ${source}:${line}`);
-        }
-
-        // Memory management
-        function initMemoryManagement() {
-            // Clean up event listeners on page unload
-            window.addEventListener('beforeunload', () => {
-                if (realtimeSubscription) {
-                    supabase.removeChannel(realtimeSubscription);
-                }
-            });
-
-            // Periodic cleanup
-            setInterval(() => {
-                // Force garbage collection hint (not guaranteed)
-                if (window.gc) window.gc();
-
-                // Clear old cache entries
-                performanceMetrics = {
-                    loadTime: performanceMetrics.loadTime,
-                    apiCalls: performanceMetrics.apiCalls,
-                    cacheHits: performanceMetrics.cacheHits,
-                    errors: performanceMetrics.errors
-                };
-            }, 300000); // Every 5 minutes
-        }
-
-        function updateLoadingProgress(progress, message = '') {
-            const loadingBar = document.getElementById('loading-bar');
-            const loadingText = document.querySelector('.loading-content p');
-
-            if (loadingBar) {
-                loadingBar.style.width = progress + '%';
-            }
-            if (loadingText && message) {
-                loadingText.textContent = message;
-            }
-        }
-
-        function hideLoadingScreen() {
-            const loadingScreen = document.getElementById('loading-screen');
-            const mainContainer = document.getElementById('main-container');
-
-            if (loadingScreen) {
-                loadingScreen.style.animation = 'fadeOut 0.3s ease-out';
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                    mainContainer.style.display = 'block';
-                    mainContainer.style.animation = 'fadeIn 0.3s ease-out';
-                }, 300);
-            }
-        }
-
         // Initialize app
         async function init() {
             console.log('Initializing app...');
-            const initStart = Date.now();
-
-            updateLoadingProgress(10, 'Initializing offline storage...');
-
-            // Initialize offline storage first (fast)
-            initOfflineStorage();
-
-            updateLoadingProgress(20, 'Setting up performance monitoring...');
-
-            // Initialize performance monitoring
-            initConnectionMonitoring();
-            initPerformanceOptimizations();
-            initErrorHandling();
-            initMemoryManagement();
-
-            updateLoadingProgress(40, 'Checking authentication...');
 
             // Check auth state
             const { data: { session }, error } = await supabase.auth.getSession();
             console.log('Auth session:', session);
 
             if (session?.user) {
-                updateLoadingProgress(60, 'Loading user data...');
                 console.log('User authenticated, handling user:', session.user);
                 await handleAuthenticatedUser(session.user);
             } else {
-                updateLoadingProgress(60, 'Preparing login...');
                 console.log('No authenticated user, showing login');
                 showAuthSection('login');
             }
 
-            updateLoadingProgress(80, 'Setting up event listeners...');
-
             // Event listeners
             setupEventListeners();
-
-            updateLoadingProgress(90, 'Starting background services...');
-
-            // Start periodic sync for offline data
-            setInterval(() => {
-                if (navigator.onLine && offlineAttendanceQueue.length > 0) {
-                    syncOfflineAttendance();
-                }
-            }, 30000); // Every 30 seconds
-
-            updateLoadingProgress(100, 'Ready!');
-
-            // Log performance metrics
-            const initTime = Date.now() - initStart;
-            const loadTime = Date.now() - performanceMetrics.loadTime;
-            console.log(`App initialized in ${initTime}ms (total load: ${loadTime}ms)`);
-
-            // Hide loading screen
-            setTimeout(() => {
-                hideLoadingScreen();
-
-                // Pre-warm critical data if online
-                if (navigator.onLine && session?.user) {
-                    setTimeout(() => preCacheCriticalData(), 1000);
-                }
-            }, 500);
         }
 
         async function handleAuthenticatedUser(user) {
@@ -2549,12 +1639,7 @@
 
             console.log('Updating header with:', displayName);
             document.querySelector('.operator-name').textContent = displayName;
-
-            // Update status indicator
-            const statusIndicator = document.querySelector('.status-indicator');
-            const statusText = document.querySelector('.operator-status span');
-            statusIndicator.className = 'status-indicator online';
-            statusText.textContent = currentOperator.is_admin ? 'Admin' : 'Operator';
+            document.querySelector('.operator-status').textContent = currentOperator.is_admin ? '● Admin' : '● Operator';
 
             // Show main app
             showMainApp();
@@ -2567,10 +1652,6 @@
 
             startRealtime();
             updateCounters();
-
-            // Update last sync time
-            lastSyncTime = new Date();
-            updateConnectionStatus();
         }
 
         function showAuthSection(section) {
@@ -2596,7 +1677,7 @@
 
             // Attendance form
             document.getElementById('attendance-form').addEventListener('submit', handleAttendanceSubmit);
-            // matricInput event listener is now set up in initPerformanceOptimizations with debouncing
+            matricInput.addEventListener('input', handleMatricInput);
             phoneInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -2641,30 +1722,10 @@
             addStudentClose.addEventListener('click', hideAddStudentModal);
             addStudentForm.addEventListener('submit', handleAddStudent);
 
-            // Advanced export modal
-            advancedExportBtn.addEventListener('click', showAdvancedExportModal);
-            exportTemplatesBtn.addEventListener('click', showExportTemplatesModal);
-            advancedExportClose.addEventListener('click', hideAdvancedExportModal);
-            exportTemplatesClose.addEventListener('click', hideExportTemplatesModal);
-            advancedExportForm.addEventListener('submit', handleAdvancedExport);
-            scheduleExportBtn.addEventListener('click', handleScheduleExport);
-
             // Close modal when clicking outside
             addStudentModal.addEventListener('click', (e) => {
                 if (e.target.id === 'add-student-modal') {
                     hideAddStudentModal();
-                }
-            });
-
-            advancedExportModal.addEventListener('click', (e) => {
-                if (e.target.id === 'advanced-export-modal') {
-                    hideAdvancedExportModal();
-                }
-            });
-
-            exportTemplatesModal.addEventListener('click', (e) => {
-                if (e.target.id === 'export-templates-modal') {
-                    hideExportTemplatesModal();
                 }
             });
 
@@ -2785,90 +1846,44 @@
 
             if (!matric || !currentSchool) return;
 
-            const startTime = Date.now();
+            // Double-check if already marked today before submitting
+            const today = new Date().toISOString().split('T')[0];
+            const { data: existingAttendance } = await supabase
+                .from('attendance')
+                .select('id')
+                .eq('school_id', currentSchool.id)
+                .eq('matric_number', matric)
+                .eq('attendance_date', today)
+                .single();
+
+            if (existingAttendance) {
+                showStatus('⚠️ This student has already been marked for attendance today!', 'error');
+                return;
+            }
+
             markBtn.disabled = true;
-            markBtn.innerHTML = '<div class="loading"></div> Processing...';
+            markBtn.innerHTML = '<div class="loading"></div> Marking...';
 
             try {
-                // Check if already marked today (from offline queue too)
-                const today = new Date().toISOString().split('T')[0];
-                let alreadyMarked = false;
+                const { data, error } = await supabase.rpc('mark_attendance', {
+                    p_school_id: currentSchool.id,
+                    p_matric: matric,
+                    p_date: new Date().toISOString().split('T')[0],
+                    p_operator_id: currentOperator.id,
+                    p_phone: phone || null,
+                    p_notes: notes || null
+                });
 
-                // Check online database
-                if (navigator.onLine) {
-                    const { data: existingAttendance } = await supabase
-                        .from('attendance')
-                        .select('id')
-                        .eq('school_id', currentSchool.id)
-                        .eq('matric_number', matric)
-                        .eq('attendance_date', today)
-                        .single();
+                if (error) throw error;
 
-                    if (existingAttendance) alreadyMarked = true;
-                }
-
-                // Check offline queue
-                const offlineRecord = offlineAttendanceQueue.find(record =>
-                    record.matric_number === matric &&
-                    record.attendance_date === today &&
-                    record.school_id === currentSchool.id
-                );
-
-                if (offlineRecord) alreadyMarked = true;
-
-                if (alreadyMarked) {
-                    showStatus('⚠️ This student has already been marked for attendance today!', 'error');
-                    return;
-                }
-
-                let successMessage = '';
-                let attendanceRecord = null;
-
-                if (navigator.onLine && connectionQuality !== 'poor') {
-                    // Online mode - fast path
-                    console.log('Marking attendance online...');
-                    const { data, error } = await supabase.rpc('mark_attendance', {
-                        p_school_id: currentSchool.id,
-                        p_matric: matric,
-                        p_date: today,
-                        p_operator_id: currentOperator.id,
-                        p_phone: phone || null,
-                        p_notes: notes || null
-                    });
-
-                    if (error) throw error;
-
-                    attendanceRecord = data;
-                    successMessage = '✅ Attendance marked successfully!';
-                    lastSyncTime = new Date();
-
-                } else {
-                    // Offline mode
-                    console.log('Marking attendance offline...');
-                    attendanceRecord = await markAttendanceOffline(matric, phone, notes);
-                    successMessage = '✅ Attendance marked offline! Will sync when online.';
-                }
-
-                const processingTime = Date.now() - startTime;
-                console.log(`Attendance marked in ${processingTime}ms`);
-
-                showStatus(successMessage, 'success');
+                showStatus('✅ Attendance marked successfully!', 'success');
                 resetAttendanceForm();
 
-                // Refresh dashboard data (optimistic update)
-                updateCounters();
-
-                // If online, refresh full dashboard
-                if (navigator.onLine) {
-                    loadDashboardData();
-                }
-
+                // Refresh dashboard data
+                loadDashboardData();
             } catch (error) {
                 console.error('Error marking attendance:', error);
-                const errorMsg = navigator.onLine ?
-                    '❌ Error marking attendance: ' + error.message :
-                    '❌ Error saving offline attendance: ' + error.message;
-                showStatus(errorMsg, 'error');
+                showStatus('❌ Error marking attendance: ' + error.message, 'error');
             } finally {
                 markBtn.disabled = false;
                 markBtn.textContent = 'Mark Attendance';
@@ -2900,7 +1915,6 @@
             realtimeSubscription = supabase
                 .channel('attendance_changes')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, () => {
-                    lastSyncTime = new Date();
                     updateCounters();
                 })
                 .subscribe();
@@ -3632,363 +2646,6 @@
             addStudentStatus.className = `status ${type}`;
             addStudentStatus.classList.remove('hidden');
             setTimeout(() => addStudentStatus.classList.add('hidden'), 5000);
-        }
-
-        // Advanced Export Functions
-        function showAdvancedExportModal() {
-            // Set default date range (last 7 days)
-            const endDate = new Date();
-            const startDate = new Date();
-            startDate.setDate(startDate.getDate() - 7);
-
-            document.getElementById('export-start-date').value = startDate.toISOString().split('T')[0];
-            document.getElementById('export-end-date').value = endDate.toISOString().split('T')[0];
-
-            // Load filter options
-            loadExportFilters();
-
-            advancedExportModal.classList.remove('hidden');
-        }
-
-        function hideAdvancedExportModal() {
-            advancedExportModal.classList.add('hidden');
-            advancedExportForm.reset();
-            advancedExportStatus.classList.add('hidden');
-            exportProgress.classList.add('hidden');
-        }
-
-        function showExportTemplatesModal() {
-            exportTemplatesModal.classList.remove('hidden');
-        }
-
-        function hideExportTemplatesModal() {
-            exportTemplatesModal.classList.add('hidden');
-            document.getElementById('templates-status').classList.add('hidden');
-        }
-
-        async function loadExportFilters() {
-            try {
-                // Load faculties
-                const { data: faculties } = await supabase
-                    .from('students')
-                    .select('faculty')
-                    .eq('school_id', currentSchool.id);
-
-                const facultySelect = document.getElementById('export-faculty');
-                const uniqueFaculties = [...new Set(faculties.map(f => f.faculty).filter(f => f))];
-                facultySelect.innerHTML = '<option value="">All Faculties</option>';
-                uniqueFaculties.forEach(faculty => {
-                    facultySelect.innerHTML += `<option value="${faculty}">${faculty}</option>`;
-                });
-
-                // Load departments
-                const { data: departments } = await supabase
-                    .from('students')
-                    .select('department')
-                    .eq('school_id', currentSchool.id);
-
-                const deptSelect = document.getElementById('export-department');
-                const uniqueDepts = [...new Set(departments.map(d => d.department).filter(d => d))];
-                deptSelect.innerHTML = '<option value="">All Departments</option>';
-                uniqueDepts.forEach(dept => {
-                    deptSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
-                });
-
-                // Load grades
-                const { data: grades } = await supabase
-                    .from('students')
-                    .select('grade')
-                    .eq('school_id', currentSchool.id);
-
-                const gradeSelect = document.getElementById('export-grade');
-                const uniqueGrades = [...new Set(grades.map(g => g.grade).filter(g => g))];
-                gradeSelect.innerHTML = '<option value="">All Grades</option>';
-                uniqueGrades.forEach(grade => {
-                    gradeSelect.innerHTML += `<option value="${grade}">${grade}</option>`;
-                });
-
-                // Load operators
-                const { data: operators } = await supabase
-                    .from('operators')
-                    .select('id, name')
-                    .eq('school_id', currentSchool.id);
-
-                const operatorSelect = document.getElementById('export-operator');
-                operatorSelect.innerHTML = '<option value="">All Operators</option>';
-                operators.forEach(op => {
-                    operatorSelect.innerHTML += `<option value="${op.id}">${op.name}</option>`;
-                });
-
-            } catch (error) {
-                console.error('Error loading export filters:', error);
-            }
-        }
-
-        async function handleAdvancedExport(e) {
-            e.preventDefault();
-
-            const startDate = document.getElementById('export-start-date').value;
-            const endDate = document.getElementById('export-end-date').value;
-            const faculty = document.getElementById('export-faculty').value;
-            const department = document.getElementById('export-department').value;
-            const grade = document.getElementById('export-grade').value;
-            const operator = document.getElementById('export-operator').value;
-            const format = document.getElementById('export-format').value;
-            const groupBy = document.getElementById('export-group-by').value;
-            const includeSummary = document.getElementById('export-include-summary').checked;
-            const anonymous = document.getElementById('export-anonymous').checked;
-
-            if (!startDate || !endDate) {
-                showAdvancedExportStatus('Please select date range.', 'error');
-                return;
-            }
-
-            exportProgress.classList.remove('hidden');
-            exportProgressText.textContent = 'Fetching data...';
-
-            try {
-                // Build query
-                let query = supabase
-                    .from('attendance')
-                    .select(`
-                        matric_number,
-                        attendance_date,
-                        ts,
-                        phone_captured,
-                        notes,
-                        students!inner(name, faculty, department, grade, source, next_of_kin, phone),
-                        operators(name, username)
-                    `)
-                    .eq('school_id', currentSchool.id)
-                    .gte('attendance_date', startDate)
-                    .lte('attendance_date', endDate)
-                    .order('attendance_date', { ascending: false })
-                    .order('ts', { ascending: false });
-
-                // Apply filters
-                if (faculty) {
-                    query = query.eq('students.faculty', faculty);
-                }
-                if (department) {
-                    query = query.eq('students.department', department);
-                }
-                if (grade) {
-                    query = query.eq('students.grade', grade);
-                }
-                if (operator) {
-                    query = query.eq('operator_id', operator);
-                }
-
-                exportProgressText.textContent = 'Processing data...';
-                const { data: attendance, error } = await query;
-
-                if (error) throw error;
-
-                exportProgressText.textContent = 'Generating export...';
-
-                // Process data
-                let processedData = attendance.map(record => ({
-                    Date: record.attendance_date,
-                    Time: new Date(record.ts).toLocaleString(),
-                    'Matric Number': record.matric_number,
-                    'Student Name': anonymous ? 'Anonymous' : record.students.name,
-                    Faculty: record.students.faculty || '',
-                    Department: record.students.department || '',
-                    Grade: record.students.grade || '',
-                    Source: record.students.source || '',
-                    'Next of Kin': anonymous ? '' : record.students.next_of_kin || '',
-                    'Student Phone': anonymous ? '' : record.students.phone || '',
-                    'Captured Phone': record.phone_captured || '',
-                    Operator: record.operators?.name || 'Unknown',
-                    'Operator Username': record.operators?.username || '',
-                    Notes: record.notes || ''
-                }));
-
-                // Group data if requested
-                if (groupBy !== 'none') {
-                    processedData = groupDataBy(processedData, groupBy);
-                }
-
-                // Generate export based on format
-                const filename = `attendance_export_${startDate}_to_${endDate}`;
-
-                switch (format) {
-                    case 'csv':
-                        exportToCSV(processedData, filename);
-                        break;
-                    case 'xlsx':
-                        exportToXLSX(processedData, filename, includeSummary, startDate, endDate);
-                        break;
-                    case 'pdf':
-                        exportToPDF(processedData, filename, startDate, endDate);
-                        break;
-                    case 'json':
-                        exportToJSON(processedData, filename);
-                        break;
-                }
-
-                exportProgressText.textContent = 'Export completed!';
-                setTimeout(() => {
-                    hideAdvancedExportModal();
-                }, 2000);
-
-            } catch (error) {
-                console.error('Advanced export error:', error);
-                showAdvancedExportStatus('Export failed: ' + error.message, 'error');
-                exportProgress.classList.add('hidden');
-            }
-        }
-
-        function groupDataBy(data, groupBy) {
-            const groups = {};
-            data.forEach(record => {
-                const key = record[groupBy.charAt(0).toUpperCase() + groupBy.slice(1)] || 'Unknown';
-                if (!groups[key]) groups[key] = [];
-                groups[key].push(record);
-            });
-
-            const result = [];
-            Object.keys(groups).sort().forEach(key => {
-                result.push({ [groupBy.toUpperCase()]: key, '': '' });
-                result.push(...groups[key]);
-                result.push({ '': '', 'TOTAL': groups[key].length + ' records' });
-            });
-
-            return result;
-        }
-
-        function exportToCSV(data, filename) {
-            const csv = [Object.keys(data[0]).join(',')];
-            data.forEach(row => {
-                csv.push(Object.values(row).map(v => `"${v}"`).join(','));
-            });
-            downloadFile(csv.join('\n'), `${filename}.csv`, 'text/csv');
-        }
-
-        function exportToXLSX(data, filename, includeSummary, startDate, endDate) {
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Attendance Data');
-
-            if (includeSummary) {
-                const summaryData = generateSummaryData(data, startDate, endDate);
-                const summaryWs = XLSX.utils.json_to_sheet(summaryData);
-                XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary');
-            }
-
-            XLSX.writeFile(wb, `${filename}.xlsx`);
-        }
-
-        function exportToPDF(data, filename, startDate, endDate) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            // Add title
-            doc.setFontSize(16);
-            doc.text('School Attendance Report', 20, 20);
-            doc.setFontSize(12);
-            doc.text(`Period: ${startDate} to ${endDate}`, 20, 30);
-            doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 40);
-
-            // Prepare table data
-            const headers = Object.keys(data[0]);
-            const body = data.map(row => Object.values(row));
-
-            doc.autoTable({
-                head: [headers],
-                body: body,
-                startY: 50,
-                styles: { fontSize: 8 },
-                headStyles: { fillColor: [99, 102, 241] }
-            });
-
-            doc.save(`${filename}.pdf`);
-        }
-
-        function exportToJSON(data, filename) {
-            const json = JSON.stringify(data, null, 2);
-            downloadFile(json, `${filename}.json`, 'application/json');
-        }
-
-        function generateSummaryData(data, startDate, endDate) {
-            const summary = {
-                'Report Period': `${startDate} to ${endDate}`,
-                'Total Records': data.length,
-                'Unique Students': [...new Set(data.map(r => r['Matric Number']))].length,
-                'Date Range': `${Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24))} days`
-            };
-
-            // Faculty breakdown
-            const facultyStats = {};
-            data.forEach(record => {
-                const faculty = record.Faculty || 'Unknown';
-                facultyStats[faculty] = (facultyStats[faculty] || 0) + 1;
-            });
-
-            summary['Faculty Breakdown'] = Object.entries(facultyStats)
-                .map(([faculty, count]) => `${faculty}: ${count}`)
-                .join(', ');
-
-            return [summary];
-        }
-
-        async function exportTemplate(templateType) {
-            const today = new Date().toISOString().split('T')[0];
-            let startDate, endDate, filters = {};
-
-            switch (templateType) {
-                case 'daily-report':
-                    startDate = endDate = today;
-                    break;
-                case 'weekly-summary':
-                    endDate = today;
-                    startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-                    break;
-                case 'faculty-report':
-                    endDate = today;
-                    startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-                    break;
-                case 'operator-performance':
-                    endDate = today;
-                    startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-                    break;
-                case 'absentee-list':
-                    startDate = endDate = today;
-                    break;
-                case 'late-arrivals':
-                    startDate = endDate = today;
-                    break;
-            }
-
-            // Set form values
-            document.getElementById('export-start-date').value = startDate;
-            document.getElementById('export-end-date').value = endDate;
-            document.getElementById('export-format').value = 'xlsx';
-            document.getElementById('export-group-by').value = templateType.includes('faculty') ? 'faculty' :
-                                                             templateType.includes('operator') ? 'operator' : 'none';
-            document.getElementById('export-include-summary').checked = true;
-
-            // Hide templates modal and show advanced export
-            hideExportTemplatesModal();
-            showAdvancedExportModal();
-
-            // Show status
-            const statusEl = document.getElementById('templates-status');
-            statusEl.textContent = `Template "${templateType.replace('-', ' ')}" loaded. Configure additional options and click "Generate Export".`;
-            statusEl.className = 'status success';
-            statusEl.classList.remove('hidden');
-            setTimeout(() => statusEl.classList.add('hidden'), 3000);
-        }
-
-        function handleScheduleExport() {
-            alert('Scheduled exports feature coming soon! This will allow you to set up automatic daily/weekly reports.');
-        }
-
-        function showAdvancedExportStatus(message, type) {
-            advancedExportStatus.textContent = message;
-            advancedExportStatus.className = `status ${type}`;
-            advancedExportStatus.classList.remove('hidden');
-            setTimeout(() => advancedExportStatus.classList.add('hidden'), 5000);
         }
 
         // Initialize
