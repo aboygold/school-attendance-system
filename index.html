@@ -12,6 +12,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="dns-prefetch" href="https://sjrhljtjgxjohkipxaky.supabase.co">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" as="script" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" as="script" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script" crossorigin>
     <style>
         :root {
             /* Dark Theme Color Palette */
@@ -998,6 +1001,69 @@
             font-weight: 500;
         }
 
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-bg), var(--secondary-bg));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 2rem;
+        }
+
+        .loading-content h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .loading-content p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .loading-progress {
+            width: 300px;
+            height: 4px;
+            background: var(--secondary-bg);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .loading-bar {
+            height: 100%;
+            background: var(--gradient-primary);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -1140,7 +1206,19 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2>School Attendance System</h2>
+            <p>Loading...</p>
+            <div class="loading-progress">
+                <div class="loading-bar" id="loading-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="main-container" style="display: none;">
         <header>
             <div class="brand-section">
                 <div class="logo-container">
@@ -1731,6 +1809,17 @@
             errors: 0
         };
 
+        // Offline attendance queue
+        let offlineAttendanceQueue = [];
+        let isProcessingQueue = false;
+        const ATTENDANCE_QUEUE_KEY = 'attendance_queue';
+        const STUDENT_CACHE_KEY = 'student_cache';
+        const OFFLINE_STUDENTS_KEY = 'offline_students';
+
+        // Pre-cache critical data
+        let criticalDataLoaded = false;
+        let allStudentsCache = new Map();
+
         // DOM elements
         const matricInput = document.getElementById('matric-input');
         const studentNameInput = document.getElementById('student-name');
@@ -1779,6 +1868,191 @@
         const showLoginBtn = document.getElementById('show-login');
         const mainNav = document.getElementById('main-nav');
 
+        // Offline Storage and Fast Loading Functions
+        function initOfflineStorage() {
+            // Load offline queue from storage
+            loadOfflineQueue();
+
+            // Load cached students
+            loadStudentCache();
+
+            // Pre-cache critical data when online
+            if (navigator.onLine) {
+                preCacheCriticalData();
+            }
+        }
+
+        async function loadOfflineQueue() {
+            try {
+                const stored = localStorage.getItem(ATTENDANCE_QUEUE_KEY);
+                if (stored) {
+                    offlineAttendanceQueue = JSON.parse(stored);
+                    console.log('Loaded', offlineAttendanceQueue.length, 'offline attendance records');
+                }
+            } catch (error) {
+                console.error('Error loading offline queue:', error);
+                offlineAttendanceQueue = [];
+            }
+        }
+
+        async function saveOfflineQueue() {
+            try {
+                localStorage.setItem(ATTENDANCE_QUEUE_KEY, JSON.stringify(offlineAttendanceQueue));
+            } catch (error) {
+                console.error('Error saving offline queue:', error);
+            }
+        }
+
+        async function loadStudentCache() {
+            try {
+                const stored = localStorage.getItem(STUDENT_CACHE_KEY);
+                if (stored) {
+                    const cache = JSON.parse(stored);
+                    // Convert back to Map
+                    Object.entries(cache).forEach(([key, value]) => {
+                        allStudentsCache.set(key, value);
+                    });
+                    console.log('Loaded', allStudentsCache.size, 'cached students');
+                }
+            } catch (error) {
+                console.error('Error loading student cache:', error);
+                allStudentsCache.clear();
+            }
+        }
+
+        async function saveStudentCache() {
+            try {
+                // Convert Map to object for storage
+                const cacheObj = {};
+                allStudentsCache.forEach((value, key) => {
+                    cacheObj[key] = value;
+                });
+                localStorage.setItem(STUDENT_CACHE_KEY, JSON.stringify(cacheObj));
+            } catch (error) {
+                console.error('Error saving student cache:', error);
+            }
+        }
+
+        async function preCacheCriticalData() {
+            if (criticalDataLoaded) return;
+
+            try {
+                console.log('Pre-caching critical data...');
+
+                // Cache all students for the school
+                if (currentSchool) {
+                    const { data: students, error } = await supabase
+                        .from('students')
+                        .select('matric_number, name, faculty, department, grade, source, next_of_kin, phone')
+                        .eq('school_id', currentSchool.id);
+
+                    if (!error && students) {
+                        students.forEach(student => {
+                            allStudentsCache.set(student.matric_number, {
+                                ...student,
+                                cachedAt: Date.now()
+                            });
+                        });
+                        await saveStudentCache();
+                        console.log('Pre-cached', students.length, 'students');
+                    }
+                }
+
+                criticalDataLoaded = true;
+            } catch (error) {
+                console.error('Error pre-caching data:', error);
+            }
+        }
+
+        async function markAttendanceOffline(matric, phone, notes) {
+            const attendanceRecord = {
+                id: 'offline_' + Date.now() + '_' + Math.random(),
+                matric_number: matric,
+                phone_captured: phone,
+                notes: notes,
+                attendance_date: new Date().toISOString().split('T')[0],
+                ts: new Date().toISOString(),
+                operator_id: currentOperator?.id,
+                school_id: currentSchool?.id,
+                createdAt: Date.now(),
+                synced: false
+            };
+
+            offlineAttendanceQueue.push(attendanceRecord);
+            await saveOfflineQueue();
+
+            console.log('Attendance marked offline:', attendanceRecord);
+            return attendanceRecord;
+        }
+
+        async function syncOfflineAttendance() {
+            if (isProcessingQueue || offlineAttendanceQueue.length === 0 || !navigator.onLine) {
+                return;
+            }
+
+            isProcessingQueue = true;
+            console.log('Starting offline sync, queue length:', offlineAttendanceQueue.length);
+
+            const queueCopy = [...offlineAttendanceQueue];
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (const record of queueCopy) {
+                try {
+                    // Check if already synced
+                    if (record.synced) continue;
+
+                    const { data, error } = await supabase.rpc('mark_attendance', {
+                        p_school_id: record.school_id,
+                        p_matric: record.matric_number,
+                        p_date: record.attendance_date,
+                        p_operator_id: record.operator_id,
+                        p_phone: record.phone_captured || null,
+                        p_notes: record.notes || null
+                    });
+
+                    if (error) throw error;
+
+                    // Mark as synced
+                    record.synced = true;
+                    record.syncedAt = Date.now();
+                    successCount++;
+
+                    console.log('Synced offline record:', record.matric_number);
+
+                } catch (error) {
+                    console.error('Error syncing record:', record.matric_number, error);
+                    errorCount++;
+
+                    // If it's a duplicate, mark as synced anyway
+                    if (error.message?.includes('already exists') || error.code === '23505') {
+                        record.synced = true;
+                        record.syncedAt = Date.now();
+                        successCount++;
+                    }
+                }
+            }
+
+            // Update queue
+            offlineAttendanceQueue = offlineAttendanceQueue.filter(record => !record.synced);
+            await saveOfflineQueue();
+
+            console.log(`Sync completed: ${successCount} success, ${errorCount} errors`);
+
+            // Update UI
+            if (successCount > 0) {
+                updateCounters();
+                loadDashboardData();
+            }
+
+            isProcessingQueue = false;
+
+            // Show sync status
+            if (successCount > 0) {
+                showStatus(`✅ Synced ${successCount} offline attendance records!`, 'success');
+            }
+        }
+
         // Performance and Connection Monitoring
         function initConnectionMonitoring() {
             // Monitor online/offline status
@@ -1797,6 +2071,7 @@
         }
 
         function updateConnectionStatus() {
+            const wasOffline = connectionStatus === 'offline';
             const isOnline = navigator.onLine;
             const indicator = document.querySelector('.status-indicator');
             const statusText = document.querySelector('.operator-status span');
@@ -1813,6 +2088,12 @@
                         connectionStatus = 'slow';
                         indicator.className = 'status-indicator slow';
                         statusText.textContent = 'Slow Connection';
+                    } else {
+                        // Connection restored - sync offline data
+                        if (wasOffline && offlineAttendanceQueue.length > 0) {
+                            console.log('Connection restored, syncing offline data...');
+                            syncOfflineAttendance();
+                        }
                     }
                 });
             } else {
@@ -1823,7 +2104,8 @@
 
             // Update connection info
             const lastSync = lastSyncTime ? new Date(lastSyncTime).toLocaleTimeString() : 'Never';
-            connectionInfo.textContent = `Last sync: ${lastSync} | ${connectionQuality} connection`;
+            const queueInfo = offlineAttendanceQueue.length > 0 ? ` | ${offlineAttendanceQueue.length} pending` : '';
+            connectionInfo.textContent = `Last sync: ${lastSync} | ${connectionQuality} connection${queueInfo}`;
         }
 
         async function testConnectivity() {
@@ -1967,11 +2249,20 @@
                 const matric = matricInput.value.trim();
                 if (matric.length < 3 || !currentSchool) return;
 
-                // Check cache first
+                // Check pre-cached data first (instant)
+                const preCached = allStudentsCache.get(matric);
+                if (preCached) {
+                    performanceMetrics.cacheHits++;
+                    console.log('Pre-cache hit for matric:', matric);
+                    displayStudentData(preCached);
+                    return;
+                }
+
+                // Check session cache
                 const cached = studentCache.get(matric);
                 if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
                     performanceMetrics.cacheHits++;
-                    console.log('Cache hit for matric:', matric);
+                    console.log('Session cache hit for matric:', matric);
                     displayStudentFromCache(cached.data);
                     return;
                 }
@@ -2111,9 +2402,43 @@
             }, 300000); // Every 5 minutes
         }
 
+        function updateLoadingProgress(progress, message = '') {
+            const loadingBar = document.getElementById('loading-bar');
+            const loadingText = document.querySelector('.loading-content p');
+
+            if (loadingBar) {
+                loadingBar.style.width = progress + '%';
+            }
+            if (loadingText && message) {
+                loadingText.textContent = message;
+            }
+        }
+
+        function hideLoadingScreen() {
+            const loadingScreen = document.getElementById('loading-screen');
+            const mainContainer = document.getElementById('main-container');
+
+            if (loadingScreen) {
+                loadingScreen.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    mainContainer.style.display = 'block';
+                    mainContainer.style.animation = 'fadeIn 0.3s ease-out';
+                }, 300);
+            }
+        }
+
         // Initialize app
         async function init() {
             console.log('Initializing app...');
+            const initStart = Date.now();
+
+            updateLoadingProgress(10, 'Initializing offline storage...');
+
+            // Initialize offline storage first (fast)
+            initOfflineStorage();
+
+            updateLoadingProgress(20, 'Setting up performance monitoring...');
 
             // Initialize performance monitoring
             initConnectionMonitoring();
@@ -2121,23 +2446,52 @@
             initErrorHandling();
             initMemoryManagement();
 
+            updateLoadingProgress(40, 'Checking authentication...');
+
             // Check auth state
             const { data: { session }, error } = await supabase.auth.getSession();
             console.log('Auth session:', session);
 
             if (session?.user) {
+                updateLoadingProgress(60, 'Loading user data...');
                 console.log('User authenticated, handling user:', session.user);
                 await handleAuthenticatedUser(session.user);
             } else {
+                updateLoadingProgress(60, 'Preparing login...');
                 console.log('No authenticated user, showing login');
                 showAuthSection('login');
             }
 
+            updateLoadingProgress(80, 'Setting up event listeners...');
+
             // Event listeners
             setupEventListeners();
 
+            updateLoadingProgress(90, 'Starting background services...');
+
+            // Start periodic sync for offline data
+            setInterval(() => {
+                if (navigator.onLine && offlineAttendanceQueue.length > 0) {
+                    syncOfflineAttendance();
+                }
+            }, 30000); // Every 30 seconds
+
+            updateLoadingProgress(100, 'Ready!');
+
             // Log performance metrics
-            console.log('App initialized in', Date.now() - performanceMetrics.loadTime, 'ms');
+            const initTime = Date.now() - initStart;
+            const loadTime = Date.now() - performanceMetrics.loadTime;
+            console.log(`App initialized in ${initTime}ms (total load: ${loadTime}ms)`);
+
+            // Hide loading screen
+            setTimeout(() => {
+                hideLoadingScreen();
+
+                // Pre-warm critical data if online
+                if (navigator.onLine && session?.user) {
+                    setTimeout(() => preCacheCriticalData(), 1000);
+                }
+            }, 500);
         }
 
         async function handleAuthenticatedUser(user) {
@@ -2431,44 +2785,90 @@
 
             if (!matric || !currentSchool) return;
 
-            // Double-check if already marked today before submitting
-            const today = new Date().toISOString().split('T')[0];
-            const { data: existingAttendance } = await supabase
-                .from('attendance')
-                .select('id')
-                .eq('school_id', currentSchool.id)
-                .eq('matric_number', matric)
-                .eq('attendance_date', today)
-                .single();
-
-            if (existingAttendance) {
-                showStatus('⚠️ This student has already been marked for attendance today!', 'error');
-                return;
-            }
-
+            const startTime = Date.now();
             markBtn.disabled = true;
-            markBtn.innerHTML = '<div class="loading"></div> Marking...';
+            markBtn.innerHTML = '<div class="loading"></div> Processing...';
 
             try {
-                const { data, error } = await supabase.rpc('mark_attendance', {
-                    p_school_id: currentSchool.id,
-                    p_matric: matric,
-                    p_date: new Date().toISOString().split('T')[0],
-                    p_operator_id: currentOperator.id,
-                    p_phone: phone || null,
-                    p_notes: notes || null
-                });
+                // Check if already marked today (from offline queue too)
+                const today = new Date().toISOString().split('T')[0];
+                let alreadyMarked = false;
 
-                if (error) throw error;
+                // Check online database
+                if (navigator.onLine) {
+                    const { data: existingAttendance } = await supabase
+                        .from('attendance')
+                        .select('id')
+                        .eq('school_id', currentSchool.id)
+                        .eq('matric_number', matric)
+                        .eq('attendance_date', today)
+                        .single();
 
-                showStatus('✅ Attendance marked successfully!', 'success');
+                    if (existingAttendance) alreadyMarked = true;
+                }
+
+                // Check offline queue
+                const offlineRecord = offlineAttendanceQueue.find(record =>
+                    record.matric_number === matric &&
+                    record.attendance_date === today &&
+                    record.school_id === currentSchool.id
+                );
+
+                if (offlineRecord) alreadyMarked = true;
+
+                if (alreadyMarked) {
+                    showStatus('⚠️ This student has already been marked for attendance today!', 'error');
+                    return;
+                }
+
+                let successMessage = '';
+                let attendanceRecord = null;
+
+                if (navigator.onLine && connectionQuality !== 'poor') {
+                    // Online mode - fast path
+                    console.log('Marking attendance online...');
+                    const { data, error } = await supabase.rpc('mark_attendance', {
+                        p_school_id: currentSchool.id,
+                        p_matric: matric,
+                        p_date: today,
+                        p_operator_id: currentOperator.id,
+                        p_phone: phone || null,
+                        p_notes: notes || null
+                    });
+
+                    if (error) throw error;
+
+                    attendanceRecord = data;
+                    successMessage = '✅ Attendance marked successfully!';
+                    lastSyncTime = new Date();
+
+                } else {
+                    // Offline mode
+                    console.log('Marking attendance offline...');
+                    attendanceRecord = await markAttendanceOffline(matric, phone, notes);
+                    successMessage = '✅ Attendance marked offline! Will sync when online.';
+                }
+
+                const processingTime = Date.now() - startTime;
+                console.log(`Attendance marked in ${processingTime}ms`);
+
+                showStatus(successMessage, 'success');
                 resetAttendanceForm();
 
-                // Refresh dashboard data
-                loadDashboardData();
+                // Refresh dashboard data (optimistic update)
+                updateCounters();
+
+                // If online, refresh full dashboard
+                if (navigator.onLine) {
+                    loadDashboardData();
+                }
+
             } catch (error) {
                 console.error('Error marking attendance:', error);
-                showStatus('❌ Error marking attendance: ' + error.message, 'error');
+                const errorMsg = navigator.onLine ?
+                    '❌ Error marking attendance: ' + error.message :
+                    '❌ Error saving offline attendance: ' + error.message;
+                showStatus(errorMsg, 'error');
             } finally {
                 markBtn.disabled = false;
                 markBtn.textContent = 'Mark Attendance';
