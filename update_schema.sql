@@ -20,6 +20,7 @@ ON CONFLICT (code) DO NOTHING;
 -- Add school_id to existing tables if not present
 ALTER TABLE students ADD COLUMN IF NOT EXISTS school_id UUID REFERENCES schools(id) ON DELETE CASCADE;
 ALTER TABLE operators ADD COLUMN IF NOT EXISTS school_id UUID REFERENCES schools(id) ON DELETE CASCADE;
+ALTER TABLE operators ADD COLUMN IF NOT EXISTS username TEXT UNIQUE;
 ALTER TABLE attendance ADD COLUMN IF NOT EXISTS school_id UUID REFERENCES schools(id) ON DELETE CASCADE;
 
 -- Update existing students to have school_id (assuming default school)

@@ -375,6 +375,20 @@
             border-color: #dc2626;
         }
 
+        .btn-link {
+            background: none;
+            border: none;
+            color: var(--accent-primary);
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 500;
+            padding: 0;
+        }
+
+        .btn-link:hover {
+            color: var(--accent-secondary);
+        }
+
         /* Grid Layouts */
         .grid {
             display: grid;
@@ -806,6 +820,143 @@
             opacity: 0.8;
         }
 
+        /* Keyboard Shortcuts */
+        .shortcuts-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+            margin-left: 0.5rem;
+        }
+
+        .shortcuts-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .shortcuts-modal {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        @keyframes slideIn {
+            from { transform: scale(0.9) translateY(-20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--accent-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--accent-error);
+            color: white;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .shortcut-category h4 {
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent-primary);
+            padding-bottom: 0.5rem;
+        }
+
+        .shortcut-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .shortcut-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .shortcut-item kbd {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .shortcut-item span {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -971,19 +1122,73 @@
                     </div>
                 </div>
                 <div class="operator-info">
-                    <div class="operator-name">Operator: SOLUSCIPHER</div>
-                    <div class="operator-status">● Online</div>
+                    <div class="operator-name">Not logged in</div>
+                    <div class="operator-status">● Offline</div>
+                    <button id="shortcuts-btn" class="shortcuts-btn" title="Keyboard Shortcuts (F1)">⌨️</button>
                 </div>
             </div>
         </header>
 
 
-        <nav class="nav">
+        <!-- Login Section -->
+        <section id="login" class="section active">
+            <div class="card">
+                <h3>Login to School Attendance System</h3>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email-input">Email</label>
+                        <input type="email" id="email-input" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password-input">Password</label>
+                        <input type="password" id="password-input" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn-primary" id="login-btn">Login</button>
+                </form>
+                <div id="login-status" class="hidden"></div>
+                <div class="text-center" style="margin-top: 1rem;">
+                    <p>Don't have an account? <button id="show-signup" class="btn-link">Sign Up</button></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Signup Section -->
+        <section id="signup" class="section">
+            <div class="card">
+                <h3>Create Account</h3>
+                <form id="signup-form">
+                    <div class="form-group">
+                        <label for="signup-name">Full Name</label>
+                        <input type="text" id="signup-name" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-username">Username</label>
+                        <input type="text" id="signup-username" placeholder="Choose a username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" placeholder="Create a password" required>
+                    </div>
+                    <button type="submit" class="btn-primary" id="signup-btn">Sign Up</button>
+                </form>
+                <div id="signup-status" class="hidden"></div>
+                <div class="text-center" style="margin-top: 1rem;">
+                    <p>Already have an account? <button id="show-login" class="btn-link">Login</button></p>
+                </div>
+            </div>
+        </section>
+
+        <nav class="nav" id="main-nav" style="display: none;">
             <button class="nav-btn active" data-section="dashboard">Dashboard</button>
             <button class="nav-btn" data-section="attendance">Attendance</button>
             <button class="nav-btn" data-section="import">Import Students</button>
             <button class="nav-btn hidden" data-section="admin">Admin</button>
             <button class="nav-btn" data-section="reports">Reports</button>
+            <button class="nav-btn" id="logout-btn">Logout</button>
         </nav>
 
         <!-- Dashboard Section -->
@@ -1040,6 +1245,7 @@
                     <div class="form-group">
                         <label for="student-name">Student Name</label>
                         <input type="text" id="student-name" readonly>
+                        <button type="button" id="add-student-btn" class="btn-primary" style="display: none; margin-top: 0.5rem;">Add New Student</button>
                     </div>
                     <div class="grid grid-2">
                         <div class="form-group">
@@ -1153,6 +1359,144 @@
             </div>
         </section>
 
+        <!-- Add Student Modal -->
+        <div id="add-student-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add New Student</h3>
+                    <button class="modal-close" id="add-student-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-student-form">
+                        <div class="form-group">
+                            <label for="new-matric">Matric Number</label>
+                            <input type="text" id="new-matric" required>
+                        </div>
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label for="new-last-name">Last Name</label>
+                                <input type="text" id="new-last-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-other-names">Other Names</label>
+                                <input type="text" id="new-other-names" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label for="new-faculty">Faculty</label>
+                                <input type="text" id="new-faculty" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-department">Department</label>
+                                <input type="text" id="new-department" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-3">
+                            <div class="form-group">
+                                <label for="new-grade">Grade</label>
+                                <input type="text" id="new-grade" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-source">Source</label>
+                                <input type="text" id="new-source" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-phone">Phone</label>
+                                <input type="tel" id="new-phone">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-next-of-kin">Next of Kin</label>
+                            <input type="text" id="new-next-of-kin" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Add Student</button>
+                    </form>
+                    <div id="add-student-status" class="hidden"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keyboard Shortcuts Modal -->
+        <div id="shortcuts-modal" class="modal hidden">
+            <div class="modal-content shortcuts-modal">
+                <div class="modal-header">
+                    <h3>⌨️ Keyboard Shortcuts</h3>
+                    <button class="modal-close" id="shortcuts-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="shortcuts-grid">
+                        <div class="shortcut-category">
+                            <h4>📱 Navigation</h4>
+                            <div class="shortcut-item">
+                                <kbd>1</kbd> or <kbd>D</kbd> <span>Dashboard</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>2</kbd> or <kbd>A</kbd> <span>Attendance</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>3</kbd> or <kbd>I</kbd> <span>Import Students</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>4</kbd> or <kbd>R</kbd> <span>Reports</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>5</kbd> or <kbd>Ctrl+A</kbd> <span>Admin</span>
+                            </div>
+                        </div>
+
+                        <div class="shortcut-category">
+                            <h4>📝 Attendance Form</h4>
+                            <div class="shortcut-item">
+                                <kbd>Alt+M</kbd> <span>Focus Matric Input</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>Alt+P</kbd> <span>Focus Phone Input</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>Alt+N</kbd> <span>Focus Notes Input</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>Enter</kbd> <span>Submit Attendance</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>Ctrl+Enter</kbd> <span>Quick Submit</span>
+                            </div>
+                        </div>
+
+                        <div class="shortcut-category">
+                            <h4>📊 Actions</h4>
+                            <div class="shortcut-item">
+                                <kbd>Ctrl+E</kbd> <span>Export Today's CSV</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>Ctrl+X</kbd> <span>Export Today's XLSX</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>Ctrl+R</kbd> <span>Refresh Dashboard</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>Ctrl+L</kbd> <span>Clear Form</span>
+                            </div>
+                        </div>
+
+                        <div class="shortcut-category">
+                            <h4>🔧 General</h4>
+                            <div class="shortcut-item">
+                                <kbd>F1</kbd> <span>Show Shortcuts</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>Esc</kbd> <span>Close Modals</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>Ctrl+/</kbd> <span>Help</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Footer -->
         <footer class="footer">
             <div class="footer-content">
@@ -1198,9 +1542,107 @@
         const navBtns = document.querySelectorAll('.nav-btn');
         const sections = document.querySelectorAll('.section');
 
+        // Add student elements
+        const addStudentBtn = document.getElementById('add-student-btn');
+        const addStudentModal = document.getElementById('add-student-modal');
+        const addStudentForm = document.getElementById('add-student-form');
+        const addStudentClose = document.getElementById('add-student-close');
+        const addStudentStatus = document.getElementById('add-student-status');
+
+        // Login elements
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const emailInput = document.getElementById('email-input');
+        const passwordInput = document.getElementById('password-input');
+        const signupNameInput = document.getElementById('signup-name');
+        const signupUsernameInput = document.getElementById('signup-username');
+        const signupEmailInput = document.getElementById('signup-email');
+        const signupPasswordInput = document.getElementById('signup-password');
+        const loginStatus = document.getElementById('login-status');
+        const signupStatus = document.getElementById('signup-status');
+        const showSignupBtn = document.getElementById('show-signup');
+        const showLoginBtn = document.getElementById('show-login');
+        const mainNav = document.getElementById('main-nav');
+
         // Initialize app
         async function init() {
-            await setDefaultOperator();
+            console.log('Initializing app...');
+
+            // Check auth state
+            const { data: { session }, error } = await supabase.auth.getSession();
+            console.log('Auth session:', session);
+
+            if (session?.user) {
+                console.log('User authenticated, handling user:', session.user);
+                await handleAuthenticatedUser(session.user);
+            } else {
+                console.log('No authenticated user, showing login');
+                showAuthSection('login');
+            }
+
+            // Event listeners
+            setupEventListeners();
+        }
+
+        async function handleAuthenticatedUser(user) {
+            console.log('Handling authenticated user:', user.email, user.user_metadata);
+
+            // Get or create operator record
+            const { data: operator, error } = await supabase
+                .from('operators')
+                .select('*')
+                .eq('auth_uid', user.id)
+                .single();
+
+            console.log('Operator lookup result:', operator, error);
+
+            if (operator) {
+                currentOperator = operator;
+                console.log('Using existing operator:', currentOperator);
+            } else {
+                // Create new operator
+                const operatorName = user.user_metadata?.full_name || user.email.split('@')[0];
+                const operatorUsername = user.user_metadata?.username || user.email.split('@')[0];
+
+                console.log('Creating new operator with name:', operatorName, 'username:', operatorUsername);
+
+                const { data: newOperator, error: createError } = await supabase
+                    .from('operators')
+                    .insert({
+                        auth_uid: user.id,
+                        name: operatorName,
+                        username: operatorUsername,
+                        school_id: '550e8400-e29b-41d4-a716-446655440001', // Default school
+                        is_admin: false
+                    })
+                    .select()
+                    .single();
+
+                if (createError) {
+                    console.error('Error creating operator:', createError);
+                    showAuthStatus('Error setting up account. Please contact admin.', 'error', 'login');
+                    return;
+                }
+                currentOperator = newOperator;
+                console.log('Created new operator:', currentOperator);
+            }
+
+            currentSchool = {
+                id: '550e8400-e29b-41d4-a716-446655440001',
+                name: 'University of Lagos'
+            };
+
+            // Update header with user info
+            const displayName = currentOperator.username
+                ? `${currentOperator.name} (${currentOperator.username})`
+                : currentOperator.name;
+
+            console.log('Updating header with:', displayName);
+            document.querySelector('.operator-name').textContent = displayName;
+            document.querySelector('.operator-status').textContent = currentOperator.is_admin ? '● Admin' : '● Operator';
+
+            // Show main app
+            showMainApp();
 
             // Load initial dashboard data
             await loadDashboardData();
@@ -1208,22 +1650,20 @@
             // Set default report date to today
             document.getElementById('report-date').valueAsDate = new Date();
 
-            // Event listeners
-            setupEventListeners();
-        }
-
-        async function setDefaultOperator() {
-            currentSchool = {
-                id: '550e8400-e29b-41d4-a716-446655440001',
-                name: 'University of Lagos'
-            };
-            currentOperator = {
-                id: '00000000-0000-0000-0000-000000000001',
-                name: 'SOLUSCIPHER',
-                is_admin: true
-            };
             startRealtime();
             updateCounters();
+        }
+
+        function showAuthSection(section) {
+            sections.forEach(s => s.classList.remove('active'));
+            document.getElementById(section).classList.add('active');
+            mainNav.style.display = 'none';
+        }
+
+        function showMainApp() {
+            sections.forEach(s => s.classList.remove('active'));
+            document.getElementById('dashboard').classList.add('active');
+            mainNav.style.display = 'flex';
         }
 
         function setupEventListeners() {
@@ -1257,6 +1697,51 @@
 
             // Admin
             document.getElementById('clear-data-btn').addEventListener('click', clearAllData);
+
+            // Auth forms
+            loginForm.addEventListener('submit', handleLogin);
+            signupForm.addEventListener('submit', handleSignup);
+            showSignupBtn.addEventListener('click', () => showAuthSection('signup'));
+            showLoginBtn.addEventListener('click', () => showAuthSection('login'));
+            logoutBtn.addEventListener('click', handleLogout);
+
+            // Auth state changes
+            supabase.auth.onAuthStateChange(async (event, session) => {
+                console.log('Auth state change:', event, session?.user?.email);
+                if (event === 'SIGNED_IN' && session?.user) {
+                    console.log('User signed in, handling authenticated user');
+                    await handleAuthenticatedUser(session.user);
+                } else if (event === 'SIGNED_OUT') {
+                    console.log('User signed out, showing login');
+                    showAuthSection('login');
+                }
+            });
+
+            // Add student modal
+            addStudentBtn.addEventListener('click', showAddStudentModal);
+            addStudentClose.addEventListener('click', hideAddStudentModal);
+            addStudentForm.addEventListener('submit', handleAddStudent);
+
+            // Close modal when clicking outside
+            addStudentModal.addEventListener('click', (e) => {
+                if (e.target.id === 'add-student-modal') {
+                    hideAddStudentModal();
+                }
+            });
+
+            // Keyboard shortcuts
+            document.getElementById('shortcuts-btn').addEventListener('click', showShortcutsModal);
+            document.getElementById('shortcuts-close').addEventListener('click', hideShortcutsModal);
+
+            // Close modal when clicking outside
+            document.getElementById('shortcuts-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'shortcuts-modal') {
+                    hideShortcutsModal();
+                }
+            });
+
+            // Global keyboard shortcuts
+            document.addEventListener('keydown', handleKeyboardShortcuts);
         }
 
         // Navigation
@@ -1330,6 +1815,9 @@
                     markBtn.textContent = 'Mark Attendance';
                     phoneInput.focus();
                 }
+
+                // Hide add student button since student exists
+                addStudentBtn.style.display = 'none';
             } else {
                 studentNameInput.value = '';
                 document.getElementById('student-faculty').value = '';
@@ -1339,10 +1827,14 @@
                 document.getElementById('student-next-of-kin').value = '';
                 phoneInput.value = '';
 
+                // Show add student button
+                addStudentBtn.style.display = 'inline-block';
+                document.getElementById('new-matric').value = matric;
+
                 // Clear status
                 document.getElementById('attendance-status').classList.add('hidden');
-                markBtn.disabled = false;
-                markBtn.textContent = 'Mark Attendance';
+                markBtn.disabled = true;
+                markBtn.textContent = 'Student Not Found';
             }
         }
 
@@ -1871,6 +2363,290 @@
         }
 
 
+
+        // Keyboard shortcuts functions
+        function showShortcutsModal() {
+            document.getElementById('shortcuts-modal').classList.remove('hidden');
+        }
+
+        function hideShortcutsModal() {
+            document.getElementById('shortcuts-modal').classList.add('hidden');
+        }
+
+        function handleKeyboardShortcuts(e) {
+            // Ignore shortcuts when typing in input fields (except specific keys)
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                // Allow Ctrl+Enter in forms
+                if (e.ctrlKey && e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('attendance-form').dispatchEvent(new Event('submit'));
+                    return;
+                }
+                // Allow Alt key combinations
+                if (e.altKey) {
+                    handleFormShortcuts(e);
+                }
+                return;
+            }
+
+            // Navigation shortcuts
+            if (!e.ctrlKey && !e.altKey && !e.shiftKey) {
+                switch (e.key) {
+                    case '1':
+                    case 'd':
+                    case 'D':
+                        e.preventDefault();
+                        showSection('dashboard');
+                        break;
+                    case '2':
+                    case 'a':
+                    case 'A':
+                        e.preventDefault();
+                        showSection('attendance');
+                        break;
+                    case '3':
+                    case 'i':
+                    case 'I':
+                        e.preventDefault();
+                        showSection('import');
+                        break;
+                    case '4':
+                    case 'r':
+                    case 'R':
+                        e.preventDefault();
+                        showSection('reports');
+                        break;
+                    case '5':
+                        e.preventDefault();
+                        showSection('admin');
+                        break;
+                    case 'F1':
+                        e.preventDefault();
+                        showShortcutsModal();
+                        break;
+                    case 'Escape':
+                        e.preventDefault();
+                        hideShortcutsModal();
+                        break;
+                }
+            }
+
+            // Ctrl shortcuts
+            if (e.ctrlKey && !e.altKey && !e.shiftKey) {
+                switch (e.key) {
+                    case 'e':
+                    case 'E':
+                        e.preventDefault();
+                        exportDailyReport('csv');
+                        break;
+                    case 'x':
+                    case 'X':
+                        e.preventDefault();
+                        exportDailyReport('xlsx');
+                        break;
+                    case 'r':
+                    case 'R':
+                        e.preventDefault();
+                        loadDashboardData();
+                        break;
+                    case 'l':
+                    case 'L':
+                        e.preventDefault();
+                        resetAttendanceForm();
+                        break;
+                    case 'a':
+                    case 'A':
+                        e.preventDefault();
+                        showSection('admin');
+                        break;
+                    case '/':
+                        e.preventDefault();
+                        showShortcutsModal();
+                        break;
+                }
+            }
+
+            // Alt shortcuts for form focus
+            if (e.altKey && !e.ctrlKey && !e.shiftKey) {
+                handleFormShortcuts(e);
+            }
+        }
+
+        function handleFormShortcuts(e) {
+            switch (e.key) {
+                case 'm':
+                case 'M':
+                    e.preventDefault();
+                    matricInput.focus();
+                    matricInput.select();
+                    break;
+                case 'p':
+                case 'P':
+                    e.preventDefault();
+                    phoneInput.focus();
+                    phoneInput.select();
+                    break;
+                case 'n':
+                case 'N':
+                    e.preventDefault();
+                    notesInput.focus();
+                    notesInput.select();
+                    break;
+            }
+        }
+
+        // Auth functions
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!email || !password) return;
+
+            showAuthStatus('Logging in...', 'info', 'login');
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+                if (error) throw error;
+
+                // Auth state change will handle the rest
+            } catch (error) {
+                console.error('Login error:', error);
+                showAuthStatus('Login failed: ' + error.message, 'error', 'login');
+            }
+        }
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            const name = signupNameInput.value.trim();
+            const username = signupUsernameInput.value.trim();
+            const email = signupEmailInput.value.trim();
+            const password = signupPasswordInput.value.trim();
+
+            if (!name || !username || !email || !password) return;
+
+            showAuthStatus('Creating account...', 'info', 'signup');
+
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: name,
+                            username: username
+                        },
+                        // Disable email confirmation for easier testing
+                        emailRedirectTo: window.location.origin
+                    }
+                });
+
+                if (error) throw error;
+
+                // For development, auto-confirm the user
+                if (data.user && !data.user.email_confirmed_at) {
+                    await supabase.auth.updateUser({
+                        email_confirm: true
+                    });
+                }
+
+                showAuthStatus('Account created successfully! You are now logged in.', 'success', 'signup');
+
+                // The auth state change will handle showing the main app
+            } catch (error) {
+                console.error('Signup error:', error);
+                showAuthStatus('Signup failed: ' + error.message, 'error', 'signup');
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await supabase.auth.signOut();
+                // Auth state change will handle showing login
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        function showAuthStatus(message, type, section) {
+            const statusEl = section === 'login' ? loginStatus : signupStatus;
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            statusEl.classList.remove('hidden');
+            setTimeout(() => statusEl.classList.add('hidden'), 5000);
+        }
+
+        // Add student modal functions
+        function showAddStudentModal() {
+            addStudentModal.classList.remove('hidden');
+        }
+
+        function hideAddStudentModal() {
+            addStudentModal.classList.add('hidden');
+            addStudentForm.reset();
+            addStudentStatus.classList.add('hidden');
+        }
+
+        async function handleAddStudent(e) {
+            e.preventDefault();
+
+            const matric = document.getElementById('new-matric').value.trim();
+            const lastName = document.getElementById('new-last-name').value.trim();
+            const otherNames = document.getElementById('new-other-names').value.trim();
+            const faculty = document.getElementById('new-faculty').value.trim();
+            const department = document.getElementById('new-department').value.trim();
+            const grade = document.getElementById('new-grade').value.trim();
+            const source = document.getElementById('new-source').value.trim();
+            const nextOfKin = document.getElementById('new-next-of-kin').value.trim();
+            const phone = document.getElementById('new-phone').value.trim();
+
+            if (!matric || !lastName || !otherNames || !faculty || !department || !grade || !source || !nextOfKin) {
+                showAddStudentStatus('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('students')
+                    .insert({
+                        school_id: currentSchool.id,
+                        matric_number: matric,
+                        last_name: lastName,
+                        other_names: otherNames,
+                        faculty: faculty,
+                        department: department,
+                        grade: grade,
+                        source: source,
+                        next_of_kin: nextOfKin,
+                        phone: phone || null
+                    });
+
+                if (error) throw error;
+
+                showAddStudentStatus('Student added successfully!', 'success');
+
+                // Refresh student data in the form
+                setTimeout(() => {
+                    hideAddStudentModal();
+                    handleMatricInput(); // Re-fetch student data
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error adding student:', error);
+                showAddStudentStatus('Error adding student: ' + error.message, 'error');
+            }
+        }
+
+        function showAddStudentStatus(message, type) {
+            addStudentStatus.textContent = message;
+            addStudentStatus.className = `status ${type}`;
+            addStudentStatus.classList.remove('hidden');
+            setTimeout(() => addStudentStatus.classList.add('hidden'), 5000);
+        }
 
         // Initialize
         init();
