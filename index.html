@@ -1509,34 +1509,16 @@
                                 <input type="text" id="new-other-names" required>
                             </div>
                         </div>
-                        <div class="grid grid-2">
-                            <div class="form-group">
-                                <label for="new-faculty">Faculty (optional)</label>
-                                <input type="text" id="new-faculty">
-                            </div>
-                            <div class="form-group">
-                                <label for="new-department">Department (optional)</label>
-                                <input type="text" id="new-department">
-                            </div>
-                        </div>
-                        <div class="grid grid-3">
-                            <div class="form-group">
-                                <label for="new-grade">Grade (optional)</label>
-                                <input type="text" id="new-grade">
-                            </div>
-                            <div class="form-group">
-                                <label for="new-source">Source (optional)</label>
-                                <input type="text" id="new-source">
-                            </div>
-                            <div class="form-group">
-                                <label for="new-phone">Phone *</label>
-                                <input type="tel" id="new-phone" required>
-                            </div>
-                        </div>
                         <div class="form-group">
-                            <label for="new-next-of-kin">Next of Kin (optional)</label>
-                            <input type="text" id="new-next-of-kin">
+                            <label for="new-phone">Phone Number *</label>
+                            <input type="tel" id="new-phone" required>
                         </div>
+                        <!-- Hidden optional fields -->
+                        <input type="hidden" id="new-faculty">
+                        <input type="hidden" id="new-department">
+                        <input type="hidden" id="new-grade">
+                        <input type="hidden" id="new-source">
+                        <input type="hidden" id="new-next-of-kin">
                         <button type="submit" class="btn-primary">Add Student</button>
                     </form>
                     <div id="add-student-status" class="hidden"></div>
