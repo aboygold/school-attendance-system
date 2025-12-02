@@ -1245,7 +1245,10 @@
                     <div class="form-group">
                         <label for="student-name">Student Name</label>
                         <input type="text" id="student-name" readonly>
-                        <button type="button" id="add-student-btn" class="btn-primary" style="display: none; margin-top: 0.5rem;">Add New Student</button>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                            <button type="button" id="add-student-btn" class="btn-primary" style="display: none;">Add New Student</button>
+                            <button type="button" id="edit-student-btn" class="btn-primary" style="display: none;">Edit Student</button>
+                        </div>
                     </div>
                     <div class="grid grid-2">
                         <div class="form-group">
@@ -1541,6 +1544,115 @@
             </div>
         </div>
 
+        <!-- Edit Student Modal -->
+        <div id="edit-student-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Edit Student</h3>
+                    <button class="modal-close" id="edit-student-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-student-form">
+                        <div class="form-group">
+                            <label for="edit-matric">Matric Number</label>
+                            <input type="text" id="edit-matric" readonly>
+                        </div>
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label for="edit-last-name">Last Name</label>
+                                <input type="text" id="edit-last-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-other-names">Other Names</label>
+                                <input type="text" id="edit-other-names" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label for="edit-faculty">Faculty</label>
+                                <input type="text" id="edit-faculty" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-department">Department</label>
+                                <input type="text" id="edit-department" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-3">
+                            <div class="form-group">
+                                <label for="edit-grade">Grade</label>
+                                <input type="text" id="edit-grade" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-source">Source</label>
+                                <input type="text" id="edit-source" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-phone">Phone</label>
+                                <input type="tel" id="edit-phone">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-next-of-kin">Next of Kin</label>
+                            <input type="text" id="edit-next-of-kin" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Update Student</button>
+                    </form>
+                    <div id="edit-student-status" class="hidden"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complete Student Info Modal (for attendance marking) -->
+        <div id="complete-student-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Complete Student Information</h3>
+                    <button class="modal-close" id="complete-student-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="margin-bottom: 1rem; color: var(--text-secondary);">Please fill in the missing information for <strong id="complete-student-name"></strong> before marking attendance:</p>
+                    <form id="complete-student-form">
+                        <input type="hidden" id="complete-matric">
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label for="complete-faculty">Faculty</label>
+                                <input type="text" id="complete-faculty" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="complete-department">Department</label>
+                                <input type="text" id="complete-department" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label for="complete-grade">Grade</label>
+                                <input type="text" id="complete-grade" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="complete-source">Source</label>
+                                <input type="text" id="complete-source" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label for="complete-next-of-kin">Next of Kin</label>
+                                <input type="text" id="complete-next-of-kin" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="complete-phone">Phone</label>
+                                <input type="tel" id="complete-phone">
+                            </div>
+                        </div>
+                        <div class="grid grid-2">
+                            <button type="button" id="skip-complete-btn" class="btn-danger">Skip & Mark Attendance</button>
+                            <button type="submit" class="btn-primary">Complete & Mark Attendance</button>
+                        </div>
+                    </form>
+                    <div id="complete-student-status" class="hidden"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- Keyboard Shortcuts Modal -->
         <div id="shortcuts-modal" class="modal hidden">
             <div class="modal-content shortcuts-modal">
@@ -1673,6 +1785,20 @@
         const addStudentClose = document.getElementById('add-student-close');
         const addStudentStatus = document.getElementById('add-student-status');
 
+        // Edit student elements
+        const editStudentBtn = document.getElementById('edit-student-btn');
+        const editStudentModal = document.getElementById('edit-student-modal');
+        const editStudentForm = document.getElementById('edit-student-form');
+        const editStudentClose = document.getElementById('edit-student-close');
+        const editStudentStatus = document.getElementById('edit-student-status');
+
+        // Complete student elements
+        const completeStudentModal = document.getElementById('complete-student-modal');
+        const completeStudentForm = document.getElementById('complete-student-form');
+        const completeStudentClose = document.getElementById('complete-student-close');
+        const completeStudentStatus = document.getElementById('complete-student-status');
+        const skipCompleteBtn = document.getElementById('skip-complete-btn');
+
         // Advanced export elements
         const advancedExportBtn = document.getElementById('advanced-export-btn');
         const exportTemplatesBtn = document.getElementById('export-templates-btn');
@@ -1778,6 +1904,11 @@
             document.querySelector('.operator-name').textContent = displayName;
             document.querySelector('.operator-status').textContent = currentOperator.is_admin ? '● Admin' : '● Operator';
 
+            // Show admin section if user is admin
+            if (currentOperator.is_admin) {
+                document.querySelector('[data-section="admin"]').classList.remove('hidden');
+            }
+
             // Show main app
             showMainApp();
 
@@ -1859,6 +1990,16 @@
             addStudentClose.addEventListener('click', hideAddStudentModal);
             addStudentForm.addEventListener('submit', handleAddStudent);
 
+            // Edit student modal
+            editStudentBtn.addEventListener('click', showEditStudentModal);
+            editStudentClose.addEventListener('click', hideEditStudentModal);
+            editStudentForm.addEventListener('submit', handleEditStudent);
+
+            // Complete student modal
+            completeStudentClose.addEventListener('click', hideCompleteStudentModal);
+            completeStudentForm.addEventListener('submit', handleCompleteStudentAndMarkAttendance);
+            skipCompleteBtn.addEventListener('click', handleSkipCompleteAndMarkAttendance);
+
             // Advanced export modal
             advancedExportBtn.addEventListener('click', showAdvancedExportModal);
             exportTemplatesBtn.addEventListener('click', showExportTemplatesModal);
@@ -1878,6 +2019,18 @@
             addStudentModal.addEventListener('click', (e) => {
                 if (e.target.id === 'add-student-modal') {
                     hideAddStudentModal();
+                }
+            });
+
+            editStudentModal.addEventListener('click', (e) => {
+                if (e.target.id === 'edit-student-modal') {
+                    hideEditStudentModal();
+                }
+            });
+
+            completeStudentModal.addEventListener('click', (e) => {
+                if (e.target.id === 'complete-student-modal') {
+                    hideCompleteStudentModal();
                 }
             });
 
@@ -1952,6 +2105,7 @@
                     .eq('attendance_date', today)
                     .single();
 
+
                 if (existingAttendance && !attendanceError) {
                     const attendanceTime = new Date(existingAttendance.ts);
                     const timeString = attendanceTime.toLocaleString('en-US', {
@@ -1982,6 +2136,14 @@
 
                 // Hide add student button since student exists
                 addStudentBtn.style.display = 'none';
+
+                // Show edit student button for admins
+                if (currentOperator && currentOperator.is_admin) {
+                    editStudentBtn.style.display = 'inline-block';
+                    editStudentBtn.dataset.matric = matric;
+                } else {
+                    editStudentBtn.style.display = 'none';
+                }
             } else {
                 studentNameInput.value = '';
                 document.getElementById('student-faculty').value = '';
@@ -1994,6 +2156,9 @@
                 // Show add student button
                 addStudentBtn.style.display = 'inline-block';
                 document.getElementById('new-matric').value = matric;
+
+                // Hide edit student button
+                editStudentBtn.style.display = 'none';
 
                 // Clear status
                 document.getElementById('attendance-status').classList.add('hidden');
@@ -2025,33 +2190,31 @@
                 return;
             }
 
-            markBtn.disabled = true;
-            markBtn.innerHTML = '<div class="loading"></div> Marking...';
+            // Check if student has complete information
+            const { data: student } = await supabase
+                .from('students')
+                .select('*')
+                .eq('school_id', currentSchool.id)
+                .eq('matric_number', matric)
+                .single();
 
-            try {
-                const { data, error } = await supabase.rpc('mark_attendance', {
-                    p_school_id: currentSchool.id,
-                    p_matric: matric,
-                    p_date: new Date().toISOString().split('T')[0],
-                    p_operator_id: currentOperator.id,
-                    p_phone: phone || null,
-                    p_notes: notes || null
-                });
+            if (student) {
+                const missingFields = [];
+                if (!student.faculty) missingFields.push('faculty');
+                if (!student.department) missingFields.push('department');
+                if (!student.grade) missingFields.push('grade');
+                if (!student.source) missingFields.push('source');
+                if (!student.next_of_kin) missingFields.push('next_of_kin');
 
-                if (error) throw error;
-
-                showStatus('✅ Attendance marked successfully!', 'success');
-                resetAttendanceForm();
-
-                // Refresh dashboard data
-                loadDashboardData();
-            } catch (error) {
-                console.error('Error marking attendance:', error);
-                showStatus('❌ Error marking attendance: ' + error.message, 'error');
-            } finally {
-                markBtn.disabled = false;
-                markBtn.textContent = 'Mark Attendance';
+                if (missingFields.length > 0) {
+                    // Show complete student modal
+                    showCompleteStudentModal(student, phone, notes);
+                    return;
+                }
             }
+
+            // Student has complete info, mark attendance directly
+            await markAttendance(matric, phone, notes);
         }
 
         function resetAttendanceForm() {
@@ -2064,6 +2227,8 @@
             document.getElementById('student-next-of-kin').value = '';
             phoneInput.value = '';
             notesInput.value = '';
+            addStudentBtn.style.display = 'none';
+            editStudentBtn.style.display = 'none';
             matricInput.focus();
         }
 
@@ -2196,10 +2361,8 @@
             const nextOfKinCol = findColumn(['next', 'kin', 'guardian']);
             const phoneCol = findColumn(['phone', 'mobile', 'contact']);
 
-            if (matricCol === -1 || lastNameCol === -1 || otherNamesCol === -1 ||
-                facultyCol === -1 || departmentCol === -1 || gradeCol === -1 ||
-                sourceCol === -1 || nextOfKinCol === -1) {
-                alert('Could not auto-detect required columns. Please check your file headers.');
+            if (matricCol === -1 || lastNameCol === -1 || otherNamesCol === -1) {
+                alert('Could not auto-detect required columns. CSV must include at least: matric, last name, other names. All other fields are optional and can be filled later when marking attendance.');
                 return;
             }
 
@@ -2240,12 +2403,12 @@
                         matric_number: row[matricCol]?.toString().trim(),
                         last_name: row[lastNameCol]?.toString().trim(),
                         other_names: row[otherNamesCol]?.toString().trim(),
-                        faculty: row[facultyCol]?.toString().trim(),
-                        department: row[departmentCol]?.toString().trim(),
-                        grade: row[gradeCol]?.toString().trim(),
-                        source: row[sourceCol]?.toString().trim(),
-                        next_of_kin: row[nextOfKinCol]?.toString().trim(),
-                        phone: phoneCol !== null ? row[phoneCol]?.toString().trim() : null
+                        faculty: facultyCol !== -1 ? row[facultyCol]?.toString().trim() : null,
+                        department: departmentCol !== -1 ? row[departmentCol]?.toString().trim() : null,
+                        grade: gradeCol !== -1 ? row[gradeCol]?.toString().trim() : null,
+                        source: sourceCol !== -1 ? row[sourceCol]?.toString().trim() : null,
+                        next_of_kin: nextOfKinCol !== -1 ? row[nextOfKinCol]?.toString().trim() : null,
+                        phone: phoneCol !== -1 ? row[phoneCol]?.toString().trim() : null
                     })).filter(s => s.matric_number && s.last_name && s.other_names);
 
                     console.log(`Batch ${Math.floor(i/batchSize) + 1}: ${students.length} valid students`);
@@ -2810,6 +2973,219 @@
             addStudentStatus.className = `status ${type}`;
             addStudentStatus.classList.remove('hidden');
             setTimeout(() => addStudentStatus.classList.add('hidden'), 5000);
+        }
+
+        // Edit student modal functions
+        function showEditStudentModal() {
+            const matric = editStudentBtn.dataset.matric;
+            if (!matric) return;
+
+            // Fetch current student data
+            supabase
+                .from('students')
+                .select('*')
+                .eq('school_id', currentSchool.id)
+                .eq('matric_number', matric)
+                .single()
+                .then(({ data: student, error }) => {
+                    if (error) {
+                        console.error('Error fetching student:', error);
+                        return;
+                    }
+
+                    // Populate form
+                    document.getElementById('edit-matric').value = student.matric_number;
+                    document.getElementById('edit-last-name').value = student.last_name;
+                    document.getElementById('edit-other-names').value = student.other_names;
+                    document.getElementById('edit-faculty').value = student.faculty || '';
+                    document.getElementById('edit-department').value = student.department || '';
+                    document.getElementById('edit-grade').value = student.grade || '';
+                    document.getElementById('edit-source').value = student.source || '';
+                    document.getElementById('edit-phone').value = student.phone || '';
+                    document.getElementById('edit-next-of-kin').value = student.next_of_kin || '';
+
+                    editStudentModal.classList.remove('hidden');
+                });
+        }
+
+        function hideEditStudentModal() {
+            editStudentModal.classList.add('hidden');
+            editStudentForm.reset();
+            editStudentStatus.classList.add('hidden');
+        }
+
+        async function handleEditStudent(e) {
+            e.preventDefault();
+
+            const matric = document.getElementById('edit-matric').value.trim();
+            const lastName = document.getElementById('edit-last-name').value.trim();
+            const otherNames = document.getElementById('edit-other-names').value.trim();
+            const faculty = document.getElementById('edit-faculty').value.trim();
+            const department = document.getElementById('edit-department').value.trim();
+            const grade = document.getElementById('edit-grade').value.trim();
+            const source = document.getElementById('edit-source').value.trim();
+            const phone = document.getElementById('edit-phone').value.trim();
+            const nextOfKin = document.getElementById('edit-next-of-kin').value.trim();
+
+            if (!matric || !lastName || !otherNames || !faculty || !department || !grade || !source || !nextOfKin) {
+                showEditStudentStatus('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('students')
+                    .update({
+                        last_name: lastName,
+                        other_names: otherNames,
+                        faculty: faculty,
+                        department: department,
+                        grade: grade,
+                        source: source,
+                        phone: phone || null,
+                        next_of_kin: nextOfKin,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('school_id', currentSchool.id)
+                    .eq('matric_number', matric);
+
+                if (error) throw error;
+
+                showEditStudentStatus('Student updated successfully!', 'success');
+
+                // Refresh student data in the form
+                setTimeout(() => {
+                    hideEditStudentModal();
+                    handleMatricInput(); // Re-fetch student data
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error updating student:', error);
+                showEditStudentStatus('Error updating student: ' + error.message, 'error');
+            }
+        }
+
+        function showEditStudentStatus(message, type) {
+            editStudentStatus.textContent = message;
+            editStudentStatus.className = `status ${type}`;
+            editStudentStatus.classList.remove('hidden');
+            setTimeout(() => editStudentStatus.classList.add('hidden'), 5000);
+        }
+
+        function showCompleteStudentModal(student, phone, notes) {
+            document.getElementById('complete-student-name').textContent = `${student.other_names} ${student.last_name}`;
+            document.getElementById('complete-matric').value = student.matric_number;
+
+            // Pre-fill with existing data if available
+            document.getElementById('complete-faculty').value = student.faculty || '';
+            document.getElementById('complete-department').value = student.department || '';
+            document.getElementById('complete-grade').value = student.grade || '';
+            document.getElementById('complete-source').value = student.source || '';
+            document.getElementById('complete-next-of-kin').value = student.next_of_kin || '';
+            document.getElementById('complete-phone').value = phone || student.phone || '';
+
+            // Store additional data for later use
+            completeStudentModal._phone = phone;
+            completeStudentModal._notes = notes;
+
+            completeStudentModal.classList.remove('hidden');
+        }
+
+        function hideCompleteStudentModal() {
+            completeStudentModal.classList.add('hidden');
+            completeStudentForm.reset();
+            completeStudentStatus.classList.add('hidden');
+        }
+
+        async function handleCompleteStudentAndMarkAttendance(e) {
+            e.preventDefault();
+
+            const matric = document.getElementById('complete-matric').value;
+            const faculty = document.getElementById('complete-faculty').value.trim();
+            const department = document.getElementById('complete-department').value.trim();
+            const grade = document.getElementById('complete-grade').value.trim();
+            const source = document.getElementById('complete-source').value.trim();
+            const nextOfKin = document.getElementById('complete-next-of-kin').value.trim();
+            const phone = document.getElementById('complete-phone').value.trim();
+            const notes = completeStudentModal._notes;
+
+            if (!faculty || !department || !grade || !source || !nextOfKin) {
+                showCompleteStudentStatus('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            try {
+                // Update student information
+                const { error: updateError } = await supabase
+                    .from('students')
+                    .update({
+                        faculty: faculty,
+                        department: department,
+                        grade: grade,
+                        source: source,
+                        next_of_kin: nextOfKin,
+                        phone: phone || null,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('school_id', currentSchool.id)
+                    .eq('matric_number', matric);
+
+                if (updateError) throw updateError;
+
+                // Mark attendance
+                await markAttendance(matric, phone, notes);
+                hideCompleteStudentModal();
+
+            } catch (error) {
+                console.error('Error completing student info:', error);
+                showCompleteStudentStatus('Error updating student: ' + error.message, 'error');
+            }
+        }
+
+        async function handleSkipCompleteAndMarkAttendance() {
+            const matric = document.getElementById('complete-matric').value;
+            const phone = completeStudentModal._phone;
+            const notes = completeStudentModal._notes;
+
+            await markAttendance(matric, phone, notes);
+            hideCompleteStudentModal();
+        }
+
+        async function markAttendance(matric, phone, notes) {
+            markBtn.disabled = true;
+            markBtn.innerHTML = '<div class="loading"></div> Marking...';
+
+            try {
+                const { data, error } = await supabase.rpc('mark_attendance', {
+                    p_school_id: currentSchool.id,
+                    p_matric: matric,
+                    p_date: new Date().toISOString().split('T')[0],
+                    p_operator_id: currentOperator.id,
+                    p_phone: phone || null,
+                    p_notes: notes || null
+                });
+
+                if (error) throw error;
+
+                showStatus('✅ Attendance marked successfully!', 'success');
+                resetAttendanceForm();
+
+                // Refresh dashboard data
+                loadDashboardData();
+            } catch (error) {
+                console.error('Error marking attendance:', error);
+                showStatus('❌ Error marking attendance: ' + error.message, 'error');
+            } finally {
+                markBtn.disabled = false;
+                markBtn.textContent = 'Mark Attendance';
+            }
+        }
+
+        function showCompleteStudentStatus(message, type) {
+            completeStudentStatus.textContent = message;
+            completeStudentStatus.className = `status ${type}`;
+            completeStudentStatus.classList.remove('hidden');
+            setTimeout(() => completeStudentStatus.classList.add('hidden'), 5000);
         }
 
         // Advanced Export Functions
