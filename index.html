@@ -1288,19 +1288,41 @@
 
         <!-- Import Section -->
         <section id="import" class="section">
-            <div class="card">
-                <h3>Import Student Master File</h3>
-                <form id="import-form">
-                    <div class="form-group">
-                        <label for="file-input">Select CSV or XLSX file</label>
-                        <input type="file" id="file-input" accept=".csv,.xlsx,.xls" required>
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>Import Student Master File</h3>
+                    <form id="import-form">
+                        <div class="form-group">
+                            <label for="file-input">Select CSV or XLSX file</label>
+                            <input type="file" id="file-input" accept=".csv,.xlsx,.xls" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Import Students</button>
+                    </form>
+                    <div id="import-status"></div>
+                    <div id="import-progress" class="hidden">
+                        <progress value="0" max="100"></progress>
+                        <span id="progress-text">0%</span>
                     </div>
-                    <button type="submit" class="btn-primary">Import Students</button>
-                </form>
-                <div id="import-status"></div>
-                <div id="import-progress" class="hidden">
-                    <progress value="0" max="100"></progress>
-                    <span id="progress-text">0%</span>
+                </div>
+
+                <div class="card">
+                    <h3>Import Attendance Records</h3>
+                    <form id="attendance-import-form">
+                        <div class="form-group">
+                            <label for="attendance-file-input">Select CSV or XLSX file</label>
+                            <input type="file" id="attendance-file-input" accept=".csv,.xlsx,.xls" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="attendance-date-input">Attendance Date</label>
+                            <input type="date" id="attendance-date-input" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Import Attendance</button>
+                    </form>
+                    <div id="attendance-import-status"></div>
+                    <div id="attendance-import-progress" class="hidden">
+                        <progress value="0" max="100"></progress>
+                        <span id="attendance-progress-text">0%</span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1900,6 +1922,9 @@
             // Set default report date to today
             document.getElementById('report-date').valueAsDate = new Date();
 
+            // Set default attendance import date to today
+            document.getElementById('attendance-date-input').valueAsDate = new Date();
+
             startRealtime();
             updateCounters();
         }
@@ -1938,6 +1963,7 @@
             // Import
             document.getElementById('file-input').addEventListener('change', handleFileSelect);
             document.getElementById('import-form').addEventListener('submit', handleImportSubmit);
+            document.getElementById('attendance-import-form').addEventListener('submit', handleAttendanceImportSubmit);
 
             // Reports
             document.getElementById('export-daily-csv-btn').addEventListener('click', () => exportDailyReport('csv'));
@@ -2407,6 +2433,158 @@
             } catch (error) {
                 console.error('Import error:', error);
                 document.getElementById('import-status').innerHTML = `<div class="status error">Import failed: ${error.message}</div>`;
+            } finally {
+                progressEl.classList.add('hidden');
+            }
+        }
+
+        async function handleAttendanceImportSubmit(e) {
+            e.preventDefault();
+            const file = document.getElementById('attendance-file-input').files[0];
+            const attendanceDate = document.getElementById('attendance-date-input').value;
+
+            if (!file || !attendanceDate) return;
+
+            // Parse file
+            let data;
+            if (file.name.endsWith('.csv')) {
+                const text = await file.text();
+                data = XLSX.utils.csv_to_sheet(text);
+                data = XLSX.utils.sheet_to_json(data, { header: 1, defval: null });
+            } else {
+                const arrayBuffer = await file.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const sheet = workbook.Sheets[sheetName];
+                data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null, blankrows: false });
+            }
+
+            console.log('Parsed attendance data length:', data.length);
+
+            // Auto-detect columns from first row
+            const headers = data[0];
+            const findColumn = (names) => {
+                for (let i = 0; i < headers.length; i++) {
+                    const header = headers[i]?.toString().toLowerCase().trim();
+                    if (header && names.some(name => header.includes(name.toLowerCase()))) {
+                        return i;
+                    }
+                }
+                return -1;
+            };
+
+            const matricCol = findColumn(['matric', 'number', 'id']);
+            const timeCol = findColumn(['time', 'timestamp', 'ts']);
+            const phoneCol = findColumn(['phone', 'mobile', 'contact']);
+            const notesCol = findColumn(['notes', 'comment']);
+
+            if (matricCol === -1) {
+                alert('Could not auto-detect required column. CSV must include at least: matric number.');
+                return;
+            }
+
+            const progressEl = document.getElementById('attendance-import-progress');
+            const progressText = document.getElementById('attendance-progress-text');
+            progressEl.classList.remove('hidden');
+
+            try {
+                // Remove header
+                data.shift();
+                console.log('Total attendance rows after header removal:', data.length);
+
+                // Get current operator for attendance records
+                const operatorId = currentOperator?.id || '00000000-0000-0000-0000-000000000001';
+
+                // Batch process attendance records
+                const batchSize = 500;
+                let successCount = 0;
+                let errorCount = 0;
+                const errors = [];
+                console.log('Starting attendance batch processing...');
+
+                for (let i = 0; i < data.length; i += batchSize) {
+                    const batch = data.slice(i, i + batchSize);
+                    console.log(`Processing attendance batch ${Math.floor(i/batchSize) + 1}, rows ${i} to ${i + batch.length - 1}`);
+
+                    const attendanceRecords = batch.map(row => ({
+                        school_id: currentSchool.id,
+                        matric_number: row[matricCol]?.toString().trim(),
+                        attendance_date: attendanceDate,
+                        ts: timeCol !== -1 && row[timeCol] ? new Date(row[timeCol]).toISOString() : new Date().toISOString(),
+                        operator_id: operatorId,
+                        phone_captured: phoneCol !== -1 ? row[phoneCol]?.toString().trim() : null,
+                        notes: notesCol !== -1 ? row[notesCol]?.toString().trim() : null
+                    })).filter(record => record.matric_number);
+
+                    console.log(`Attendance batch ${Math.floor(i/batchSize) + 1}: ${attendanceRecords.length} valid records`);
+
+                    if (attendanceRecords.length > 0) {
+                        // Check if students exist first
+                        const matricNumbers = attendanceRecords.map(r => r.matric_number);
+                        const { data: existingStudents, error: studentCheckError } = await supabase
+                            .from('students')
+                            .select('matric_number')
+                            .eq('school_id', currentSchool.id)
+                            .in('matric_number', matricNumbers);
+
+                        if (studentCheckError) {
+                            console.error('Error checking students:', studentCheckError);
+                            errorCount += attendanceRecords.length;
+                            errors.push(`Batch ${Math.floor(i/batchSize) + 1}: Student check failed - ${studentCheckError.message}`);
+                            continue;
+                        }
+
+                        const existingMatrics = new Set(existingStudents.map(s => s.matric_number));
+                        const validRecords = attendanceRecords.filter(r => existingMatrics.has(r.matric_number));
+
+                        console.log(`Batch ${Math.floor(i/batchSize) + 1}: ${validRecords.length} records with existing students`);
+
+                        if (validRecords.length > 0) {
+                            const { error } = await supabase
+                                .from('attendance')
+                                .upsert(validRecords, {
+                                    onConflict: 'school_id,matric_number,attendance_date',
+                                    ignoreDuplicates: false
+                                });
+
+                            if (error) {
+                                console.error(`Attendance batch ${Math.floor(i/batchSize) + 1} error:`, error);
+                                errorCount += validRecords.length;
+                                errors.push(`Batch ${Math.floor(i/batchSize) + 1}: ${error.message}`);
+                            } else {
+                                successCount += validRecords.length;
+                                console.log(`Attendance batch ${Math.floor(i/batchSize) + 1} success: ${validRecords.length} records`);
+                            }
+                        }
+
+                        const invalidCount = attendanceRecords.length - validRecords.length;
+                        if (invalidCount > 0) {
+                            errorCount += invalidCount;
+                            errors.push(`Batch ${Math.floor(i/batchSize) + 1}: ${invalidCount} records skipped (students not found)`);
+                        }
+                    }
+
+                    // Update progress
+                    const progress = Math.round((i + batch.length) / data.length * 100);
+                    progressEl.querySelector('progress').value = progress;
+                    progressText.textContent = `${progress}%`;
+                }
+
+                let statusMessage = `Attendance import completed. ${successCount} records imported successfully.`;
+                if (errorCount > 0) {
+                    statusMessage += ` ${errorCount} errors.`;
+                }
+                document.getElementById('attendance-import-status').innerHTML = `<div class="status ${errorCount > 0 ? 'error' : 'success'}">${statusMessage}</div>`;
+                if (errors.length > 0) {
+                    document.getElementById('attendance-import-status').innerHTML += '<ul>' + errors.map(e => `<li>${e}</li>`).join('') + '</ul>';
+                }
+
+                // Refresh dashboard data
+                loadDashboardData();
+
+            } catch (error) {
+                console.error('Attendance import error:', error);
+                document.getElementById('attendance-import-status').innerHTML = `<div class="status error">Import failed: ${error.message}</div>`;
             } finally {
                 progressEl.classList.add('hidden');
             }
