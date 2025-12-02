@@ -2119,8 +2119,8 @@
                 // Hide add student button since student exists
                 addStudentBtn.style.display = 'none';
 
-                // Show edit student button for admins
-                if (currentOperator && currentOperator.is_admin) {
+                // Show edit student button for all operators
+                if (currentOperator) {
                     editStudentBtn.style.display = 'inline-block';
                     editStudentBtn.dataset.matric = matric;
                 } else {
