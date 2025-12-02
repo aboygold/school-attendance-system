@@ -1496,46 +1496,46 @@
                 <div class="modal-body">
                     <form id="add-student-form">
                         <div class="form-group">
-                            <label for="new-matric">Matric Number</label>
+                            <label for="new-matric">Matric Number *</label>
                             <input type="text" id="new-matric" required>
                         </div>
                         <div class="grid grid-2">
                             <div class="form-group">
-                                <label for="new-last-name">Last Name</label>
+                                <label for="new-last-name">Last Name *</label>
                                 <input type="text" id="new-last-name" required>
                             </div>
                             <div class="form-group">
-                                <label for="new-other-names">Other Names</label>
+                                <label for="new-other-names">Other Names *</label>
                                 <input type="text" id="new-other-names" required>
                             </div>
                         </div>
                         <div class="grid grid-2">
                             <div class="form-group">
-                                <label for="new-faculty">Faculty</label>
-                                <input type="text" id="new-faculty" required>
+                                <label for="new-faculty">Faculty (optional)</label>
+                                <input type="text" id="new-faculty">
                             </div>
                             <div class="form-group">
-                                <label for="new-department">Department</label>
-                                <input type="text" id="new-department" required>
+                                <label for="new-department">Department (optional)</label>
+                                <input type="text" id="new-department">
                             </div>
                         </div>
                         <div class="grid grid-3">
                             <div class="form-group">
-                                <label for="new-grade">Grade</label>
-                                <input type="text" id="new-grade" required>
+                                <label for="new-grade">Grade (optional)</label>
+                                <input type="text" id="new-grade">
                             </div>
                             <div class="form-group">
-                                <label for="new-source">Source</label>
-                                <input type="text" id="new-source" required>
+                                <label for="new-source">Source (optional)</label>
+                                <input type="text" id="new-source">
                             </div>
                             <div class="form-group">
-                                <label for="new-phone">Phone</label>
-                                <input type="tel" id="new-phone">
+                                <label for="new-phone">Phone *</label>
+                                <input type="tel" id="new-phone" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="new-next-of-kin">Next of Kin</label>
-                            <input type="text" id="new-next-of-kin" required>
+                            <label for="new-next-of-kin">Next of Kin (optional)</label>
+                            <input type="text" id="new-next-of-kin">
                         </div>
                         <button type="submit" class="btn-primary">Add Student</button>
                     </form>
@@ -1559,41 +1559,41 @@
                         </div>
                         <div class="grid grid-2">
                             <div class="form-group">
-                                <label for="edit-last-name">Last Name</label>
+                                <label for="edit-last-name">Last Name *</label>
                                 <input type="text" id="edit-last-name" required>
                             </div>
                             <div class="form-group">
-                                <label for="edit-other-names">Other Names</label>
+                                <label for="edit-other-names">Other Names *</label>
                                 <input type="text" id="edit-other-names" required>
                             </div>
                         </div>
                         <div class="grid grid-2">
                             <div class="form-group">
-                                <label for="edit-faculty">Faculty</label>
-                                <input type="text" id="edit-faculty" required>
+                                <label for="edit-faculty">Faculty (optional)</label>
+                                <input type="text" id="edit-faculty">
                             </div>
                             <div class="form-group">
-                                <label for="edit-department">Department</label>
-                                <input type="text" id="edit-department" required>
+                                <label for="edit-department">Department (optional)</label>
+                                <input type="text" id="edit-department">
                             </div>
                         </div>
                         <div class="grid grid-3">
                             <div class="form-group">
-                                <label for="edit-grade">Grade</label>
-                                <input type="text" id="edit-grade" required>
+                                <label for="edit-grade">Grade (optional)</label>
+                                <input type="text" id="edit-grade">
                             </div>
                             <div class="form-group">
-                                <label for="edit-source">Source</label>
-                                <input type="text" id="edit-source" required>
+                                <label for="edit-source">Source (optional)</label>
+                                <input type="text" id="edit-source">
                             </div>
                             <div class="form-group">
-                                <label for="edit-phone">Phone</label>
-                                <input type="tel" id="edit-phone">
+                                <label for="edit-phone">Phone *</label>
+                                <input type="tel" id="edit-phone" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="edit-next-of-kin">Next of Kin</label>
-                            <input type="text" id="edit-next-of-kin" required>
+                            <label for="edit-next-of-kin">Next of Kin (optional)</label>
+                            <input type="text" id="edit-next-of-kin">
                         </div>
                         <button type="submit" class="btn-primary">Update Student</button>
                     </form>
@@ -2190,28 +2190,7 @@
                 return;
             }
 
-            // Check if student has complete information
-            const { data: student } = await supabase
-                .from('students')
-                .select('*')
-                .eq('school_id', currentSchool.id)
-                .eq('matric_number', matric)
-                .single();
-
-            if (student) {
-                const missingFields = [];
-                if (!student.faculty) missingFields.push('faculty');
-                if (!student.department) missingFields.push('department');
-                if (!student.grade) missingFields.push('grade');
-                if (!student.source) missingFields.push('source');
-                if (!student.next_of_kin) missingFields.push('next_of_kin');
-
-                if (missingFields.length > 0) {
-                    // Show complete student modal
-                    showCompleteStudentModal(student, phone, notes);
-                    return;
-                }
-            }
+            // Student information is now optional - proceed with attendance marking
 
             // Student has complete info, mark attendance directly
             await markAttendance(matric, phone, notes);
@@ -2931,8 +2910,8 @@
             const nextOfKin = document.getElementById('new-next-of-kin').value.trim();
             const phone = document.getElementById('new-phone').value.trim();
 
-            if (!matric || !lastName || !otherNames || !faculty || !department || !grade || !source || !nextOfKin) {
-                showAddStudentStatus('Please fill in all required fields.', 'error');
+            if (!matric || !lastName || !otherNames || !phone) {
+                showAddStudentStatus('Please fill in matric number, name, and phone number.', 'error');
                 return;
             }
 
@@ -2944,12 +2923,12 @@
                         matric_number: matric,
                         last_name: lastName,
                         other_names: otherNames,
-                        faculty: faculty,
-                        department: department,
-                        grade: grade,
-                        source: source,
-                        next_of_kin: nextOfKin,
-                        phone: phone || null
+                        faculty: faculty || null,
+                        department: department || null,
+                        grade: grade || null,
+                        source: source || null,
+                        next_of_kin: nextOfKin || null,
+                        phone: phone
                     });
 
                 if (error) throw error;
@@ -3027,8 +3006,8 @@
             const phone = document.getElementById('edit-phone').value.trim();
             const nextOfKin = document.getElementById('edit-next-of-kin').value.trim();
 
-            if (!matric || !lastName || !otherNames || !faculty || !department || !grade || !source || !nextOfKin) {
-                showEditStudentStatus('Please fill in all required fields.', 'error');
+            if (!matric || !lastName || !otherNames || !phone) {
+                showEditStudentStatus('Please fill in matric number, name, and phone number.', 'error');
                 return;
             }
 
@@ -3038,12 +3017,12 @@
                     .update({
                         last_name: lastName,
                         other_names: otherNames,
-                        faculty: faculty,
-                        department: department,
-                        grade: grade,
-                        source: source,
-                        phone: phone || null,
-                        next_of_kin: nextOfKin,
+                        faculty: faculty || null,
+                        department: department || null,
+                        grade: grade || null,
+                        source: source || null,
+                        phone: phone,
+                        next_of_kin: nextOfKin || null,
                         updated_at: new Date().toISOString()
                     })
                     .eq('school_id', currentSchool.id)
