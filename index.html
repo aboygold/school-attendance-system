@@ -1399,7 +1399,7 @@
             <div class="brand-section">
                 <div class="logo-container">
                     <div class="logo-main">School Attendance System</div>
-                    <div class="logo-subtitle">by BESTBUY INTERNATIONAL TECHNOLOGY</div>
+                    <div class="logo-subtitle" id="school-name-display">University of Lagos</div>
                 </div>
                 <div class="brand-tagline">
                     <span class="tagline-text">Smart • Secure • Efficient</span>
@@ -2151,14 +2151,7 @@
         async function init() {
             console.log('Initializing app...');
 
-            // Load saved school name after DOM is ready
-            const savedSchoolName = localStorage.getItem('schoolName');
-            if (savedSchoolName) {
-                // Use setTimeout to ensure DOM is fully rendered
-                setTimeout(() => updateHeaderSchoolName(savedSchoolName), 100);
-            }
-
-            // Check auth state
+            // Check auth state first
             const { data: { session }, error } = await supabase.auth.getSession();
             console.log('Auth session:', session);
 
@@ -2169,6 +2162,17 @@
                 console.log('No authenticated user, showing login');
                 showAuthSection('login');
                 document.getElementById('loading-overlay').classList.add('hidden');
+            }
+
+            // Load saved school name after auth is handled
+            const savedSchoolName = localStorage.getItem('schoolName');
+            console.log('Loading saved school name:', savedSchoolName);
+            if (savedSchoolName) {
+                waitForElementAndUpdate('school-name-display', savedSchoolName);
+            } else {
+                console.log('No saved school name found, using default');
+                // Set default school name from database
+                waitForElementAndUpdate('school-name-display', 'University of Lagos');
             }
 
             // Event listeners
@@ -2652,6 +2656,7 @@
             if (!file) return;
 
             // Save school name to localStorage
+            console.log('Saving school name:', schoolName);
             localStorage.setItem('schoolName', schoolName);
             updateHeaderSchoolName(schoolName);
 
@@ -3269,7 +3274,10 @@
 
                 // Clear school name from localStorage
                 localStorage.removeItem('schoolName');
-                updateHeaderSchoolName('by BESTBUY INTERNATIONAL TECHNOLOGY');
+                const schoolNameDisplay = document.getElementById('school-name-display');
+                if (schoolNameDisplay) {
+                    schoolNameDisplay.textContent = 'University of Lagos';
+                }
 
                 alert('All data cleared successfully. You can now import data for a new school.');
                 location.reload(); // Refresh to reset counters
@@ -3530,13 +3538,37 @@
         }
 
         function updateHeaderSchoolName(schoolName) {
-            const logoSubtitle = document.querySelector('.logo-subtitle');
-            if (logoSubtitle) {
-                logoSubtitle.textContent = schoolName;
+            const schoolNameDisplay = document.getElementById('school-name-display');
+            if (schoolNameDisplay) {
+                schoolNameDisplay.textContent = schoolName;
                 console.log('Updated header school name to:', schoolName);
+                return true;
             } else {
-                console.warn('Could not find .logo-subtitle element');
+                console.warn('Could not find school-name-display element');
+                return false;
             }
+        }
+
+        function waitForElementAndUpdate(elementId, schoolName, maxAttempts = 10) {
+            let attempts = 0;
+
+            const tryUpdate = () => {
+                attempts++;
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.textContent = schoolName;
+                    console.log('Updated header school name to:', schoolName, 'on attempt', attempts);
+                    return; // Success
+                }
+
+                if (attempts < maxAttempts) {
+                    setTimeout(tryUpdate, 100 * attempts); // Increasing delay
+                } else {
+                    console.error('Failed to update school name after', maxAttempts, 'attempts');
+                }
+            };
+
+            tryUpdate();
         }
 
         // Add student modal functions
