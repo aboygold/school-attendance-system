@@ -2006,30 +2006,6 @@
                                 <input type="text" id="new-other-names" required>
                             </div>
                         </div>
-                        <div class="grid grid-2">
-                            <div class="form-group">
-                                <label for="new-faculty">Faculty</label>
-                                <input type="text" id="new-faculty">
-                            </div>
-                            <div class="form-group">
-                                <label for="new-department">Department</label>
-                                <input type="text" id="new-department">
-                            </div>
-                        </div>
-                        <div class="grid grid-2">
-                            <div class="form-group">
-                                <label for="new-grade">Grade</label>
-                                <input type="text" id="new-grade">
-                            </div>
-                            <div class="form-group">
-                                <label for="new-source">Source</label>
-                                <input type="text" id="new-source">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="new-next-of-kin">Next of Kin</label>
-                            <input type="text" id="new-next-of-kin">
-                        </div>
                         <div class="form-group">
                             <label for="new-phone">Phone Number *</label>
                             <input type="tel" id="new-phone" required>
@@ -3697,11 +3673,6 @@
             const matric = document.getElementById('new-matric').value.trim();
             const lastName = document.getElementById('new-last-name').value.trim();
             const otherNames = document.getElementById('new-other-names').value.trim();
-            const faculty = document.getElementById('new-faculty').value.trim();
-            const department = document.getElementById('new-department').value.trim();
-            const grade = document.getElementById('new-grade').value.trim();
-            const source = document.getElementById('new-source').value.trim();
-            const nextOfKin = document.getElementById('new-next-of-kin').value.trim();
             const phone = document.getElementById('new-phone').value.trim();
 
             if (!matric || !lastName || !otherNames || !phone) {
@@ -3717,11 +3688,6 @@
                         matric_number: matric,
                         last_name: lastName,
                         other_names: otherNames,
-                        faculty: faculty || null,
-                        department: department || null,
-                        grade: grade || null,
-                        source: source || null,
-                        next_of_kin: nextOfKin || null,
                         phone: phone
                     });
 
