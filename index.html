@@ -1577,6 +1577,11 @@
                     <h3>Import Student Master File</h3>
                     <form id="import-form">
                         <div class="form-group">
+                            <label for="school-name-input">School Name *</label>
+                            <input type="text" id="school-name-input"
+                                placeholder="Enter school name (e.g., University of Lagos)" required>
+                        </div>
+                        <div class="form-group">
                             <label for="file-input">Select CSV or XLSX file</label>
                             <input type="file" id="file-input" accept=".csv,.xlsx,.xls" required>
                         </div>
@@ -2133,6 +2138,12 @@
         async function init() {
             console.log('Initializing app...');
 
+            // Load saved school name
+            const savedSchoolName = localStorage.getItem('schoolName');
+            if (savedSchoolName) {
+                updateHeaderSchoolName(savedSchoolName);
+            }
+
             // Check auth state
             const { data: { session }, error } = await supabase.auth.getSession();
             console.log('Auth session:', session);
@@ -2617,8 +2628,18 @@
         async function handleImportSubmit(e) {
             e.preventDefault();
             const file = document.getElementById('file-input').files[0];
+            const schoolName = document.getElementById('school-name-input').value.trim();
+
+            if (!schoolName) {
+                document.getElementById('import-status').innerHTML = '<div class="status error">Please enter a school name.</div>';
+                return;
+            }
 
             if (!file) return;
+
+            // Save school name to localStorage
+            localStorage.setItem('schoolName', schoolName);
+            updateHeaderSchoolName(schoolName);
 
             // Parse file again for import
             let data;
@@ -3232,6 +3253,10 @@
                     is_admin: true
                 });
 
+                // Clear school name from localStorage
+                localStorage.removeItem('schoolName');
+                updateHeaderSchoolName('by BESTBUY INTERNATIONAL TECHNOLOGY');
+
                 alert('All data cleared successfully. You can now import data for a new school.');
                 location.reload(); // Refresh to reset counters
             } catch (error) {
@@ -3488,6 +3513,13 @@
             statusEl.className = `status ${type}`;
             statusEl.classList.remove('hidden');
             setTimeout(() => statusEl.classList.add('hidden'), 5000);
+        }
+
+        function updateHeaderSchoolName(schoolName) {
+            const logoSubtitle = document.querySelector('.logo-subtitle');
+            if (logoSubtitle) {
+                logoSubtitle.textContent = schoolName;
+            }
         }
 
         // Add student modal functions
