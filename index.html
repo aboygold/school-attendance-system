@@ -647,6 +647,11 @@
                 font-size: 2rem;
             }
 
+            .logo-subtitle {
+                font-size: 0.9rem;
+                margin-top: 0.25rem;
+            }
+
             .user-info {
                 flex-direction: column;
                 gap: 1.5rem;
@@ -689,7 +694,9 @@
             }
 
             .logo-subtitle {
-                font-size: 0.8rem;
+                font-size: 0.85rem;
+                line-height: 1.2;
+                margin-top: 0.25rem;
             }
 
             /* Mobile navigation improvements */
@@ -816,6 +823,12 @@
 
             .logo-main {
                 font-size: 1.5rem;
+            }
+
+            .logo-subtitle {
+                font-size: 0.8rem;
+                line-height: 1.2;
+                margin-top: 0.25rem;
             }
 
             .nav-btn {
@@ -2138,10 +2151,11 @@
         async function init() {
             console.log('Initializing app...');
 
-            // Load saved school name
+            // Load saved school name after DOM is ready
             const savedSchoolName = localStorage.getItem('schoolName');
             if (savedSchoolName) {
-                updateHeaderSchoolName(savedSchoolName);
+                // Use setTimeout to ensure DOM is fully rendered
+                setTimeout(() => updateHeaderSchoolName(savedSchoolName), 100);
             }
 
             // Check auth state
@@ -3519,6 +3533,9 @@
             const logoSubtitle = document.querySelector('.logo-subtitle');
             if (logoSubtitle) {
                 logoSubtitle.textContent = schoolName;
+                console.log('Updated header school name to:', schoolName);
+            } else {
+                console.warn('Could not find .logo-subtitle element');
             }
         }
 
