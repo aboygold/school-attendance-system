@@ -2683,7 +2683,8 @@
             // Student information is now optional - proceed with attendance marking
 
             // Student has complete info, mark attendance directly
-            await markAttendance(matric, phone, notes);
+            const studentName = studentNameInput.value;
+            await markAttendance(matric, phone, notes, studentName);
         }
 
         function resetAttendanceForm() {
@@ -3870,7 +3871,8 @@
                 if (updateError) throw updateError;
 
                 // Mark attendance
-                await markAttendance(matric, phone, completeStudentModal._notes);
+                const studentName = `${student.other_names} ${student.last_name}`;
+                await markAttendance(matric, phone, completeStudentModal._notes, studentName);
                 hideCompleteStudentModal();
 
             } catch (error) {
@@ -3888,11 +3890,12 @@
                 return;
             }
 
-            await markAttendance(matric, phone, completeStudentModal._notes);
+            const studentName = `${student.other_names} ${student.last_name}`;
+            await markAttendance(matric, phone, completeStudentModal._notes, studentName);
             hideCompleteStudentModal();
         }
 
-        async function markAttendance(matric, phone, notes) {
+        async function markAttendance(matric, phone, notes, studentName = '') {
             markBtn.disabled = true;
             markBtn.innerHTML = '<div class="loading"></div> Marking...';
 
@@ -3917,7 +3920,8 @@
 
                 if (error) throw error;
 
-                showStatus('✅ Attendance marked successfully!', 'success');
+                const displayName = studentName || 'Student';
+                showStatus(`✅ Attendance marked successfully for ${displayName} (${matric})!`, 'success');
                 resetAttendanceForm();
 
                 // Refresh dashboard data
