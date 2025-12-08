@@ -16,6 +16,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="dns-prefetch" href="https://sjrhljtjgxjohkipxaky.supabase.co">
+    <link rel="stylesheet" href="styles.css">
     <style>
         :root {
             /* Dark Theme Color Palette */
@@ -138,6 +139,28 @@
             letter-spacing: 0.1em;
             text-transform: uppercase;
             opacity: 0.8;
+        }
+
+        /* Mobile header adjustments */
+        @media (max-width: 768px) {
+            .logo-main {
+                font-size: 1.75rem;
+                line-height: 1.2;
+            }
+
+            .tagline-text {
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-main {
+                font-size: 1.5rem;
+            }
+
+            .tagline-text {
+                font-size: 0.65rem;
+            }
         }
 
         .user-info {
@@ -633,9 +656,9 @@
 
             header {
                 flex-direction: column;
-                gap: 2rem;
+                gap: 2.5rem;
                 text-align: center;
-                padding: 1.5rem;
+                padding: 2rem 1.5rem;
                 margin-bottom: 2rem;
             }
 
@@ -654,7 +677,7 @@
 
             .user-info {
                 flex-direction: column;
-                gap: 1.5rem;
+                gap: 2rem;
                 width: 100%;
             }
 
@@ -684,9 +707,9 @@
             }
 
             header {
-                padding: 1.25rem;
+                padding: 1.5rem;
                 margin-bottom: 2rem;
-                gap: 1.5rem;
+                gap: 2rem;
             }
 
             .logo-main {
@@ -817,8 +840,9 @@
             }
 
             header {
-                padding: 1rem;
+                padding: 1.25rem 1rem;
                 margin-bottom: 1.5rem;
+                gap: 1.5rem;
             }
 
             .logo-main {
@@ -1022,6 +1046,48 @@
                 display: block;
                 margin-bottom: 0.5rem;
                 font-weight: 600;
+            }
+
+            /* Improve card padding on mobile */
+            .card {
+                padding: 1.5rem 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            /* Better button sizes for touch */
+            .btn-primary,
+            .btn-danger,
+            .btn-link {
+                min-height: 48px;
+                padding: 0.875rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            /* Improve navigation buttons */
+            .nav-btn {
+                padding: 1rem 1.25rem;
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+            }
+
+            /* Better form inputs */
+            input,
+            select,
+            textarea {
+                padding: 1rem 0.875rem;
+                font-size: 16px;
+                /* Prevents zoom */
+                min-height: 48px;
+            }
+
+            /* Improve grid layouts */
+            .grid-2,
+            .grid-3 {
+                gap: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 1.25rem;
             }
         }
 
@@ -1398,11 +1464,7 @@
         <header>
             <div class="brand-section">
                 <div class="logo-container">
-                    <div class="logo-main">School Attendance System</div>
-                    <div class="logo-subtitle" id="school-name-display">University of Lagos</div>
-                </div>
-                <div class="brand-tagline">
-                    <span class="tagline-text">Smart • Secure • Efficient</span>
+                    <div class="logo-main" id="main-title">School Attendance System</div>
                 </div>
             </div>
             <div class="user-info">
@@ -1588,12 +1650,9 @@
             <div class="grid grid-2">
                 <div class="card">
                     <h3>Import Student Master File</h3>
+                    <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.875rem;">Upload a CSV or
+                        XLSX file with student information. Required columns: matric number, last name, other names.</p>
                     <form id="import-form">
-                        <div class="form-group">
-                            <label for="school-name-input">School Name *</label>
-                            <input type="text" id="school-name-input"
-                                placeholder="Enter school name (e.g., University of Lagos)" required>
-                        </div>
                         <div class="form-group">
                             <label for="file-input">Select CSV or XLSX file</label>
                             <input type="file" id="file-input" accept=".csv,.xlsx,.xls" required>
@@ -2057,8 +2116,7 @@
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <div class="footer-logo">School Attendance System</div>
-                    <div class="footer-company">by BESTBUY INTERNATIONAL TECHNOLOGY</div>
+                    <div class="footer-logo" id="footer-title">School Attendance System</div>
                 </div>
                 <div class="footer-meta">
                     <div class="footer-copyright">© 2025 All Rights Reserved</div>
@@ -2082,7 +2140,7 @@
         // Global state
         let currentUser = null;
         let currentOperator = null;
-        let currentSchool = { id: '550e8400-e29b-41d4-a716-446655440001', name: 'University of Lagos' };
+        let currentSchool = { id: '550e8400-e29b-41d4-a716-446655440001', name: 'School' };
         let realtimeSubscription = null;
 
         // DOM elements
@@ -2164,16 +2222,6 @@
                 document.getElementById('loading-overlay').classList.add('hidden');
             }
 
-            // Load saved school name after auth is handled
-            const savedSchoolName = localStorage.getItem('schoolName');
-            console.log('Loading saved school name:', savedSchoolName);
-            if (savedSchoolName) {
-                waitForElementAndUpdate('school-name-display', savedSchoolName);
-            } else {
-                console.log('No saved school name found, using default');
-                // Set default school name from database
-                waitForElementAndUpdate('school-name-display', 'University of Lagos');
-            }
 
             // Event listeners
             setupEventListeners();
@@ -2224,7 +2272,7 @@
 
             currentSchool = {
                 id: '550e8400-e29b-41d4-a716-446655440001',
-                name: 'University of Lagos'
+                name: 'School'
             };
 
             // Update header with user info
@@ -2646,19 +2694,8 @@
         async function handleImportSubmit(e) {
             e.preventDefault();
             const file = document.getElementById('file-input').files[0];
-            const schoolName = document.getElementById('school-name-input').value.trim();
-
-            if (!schoolName) {
-                document.getElementById('import-status').innerHTML = '<div class="status error">Please enter a school name.</div>';
-                return;
-            }
 
             if (!file) return;
-
-            // Save school name to localStorage
-            console.log('Saving school name:', schoolName);
-            localStorage.setItem('schoolName', schoolName);
-            updateHeaderSchoolName(schoolName);
 
             // Parse file again for import
             let data;
@@ -2709,6 +2746,7 @@
             progressEl.classList.remove('hidden');
 
             try {
+                // Parse file
                 let data;
                 if (file.name.endsWith('.csv')) {
                     const text = await file.text();
@@ -2725,6 +2763,7 @@
                 // Remove header
                 data.shift();
                 console.log('Total data rows after header removal:', data.length);
+
 
                 // Batch upsert
                 const batchSize = 500;
@@ -2748,23 +2787,6 @@
                         next_of_kin: nextOfKinCol !== -1 ? row[nextOfKinCol]?.toString().trim() : null,
                         phone: phoneCol !== -1 ? row[phoneCol]?.toString().trim() : null
                     })).filter(s => s.matric_number && s.last_name && s.other_names);
-
-                    console.log(`Batch ${Math.floor(i / batchSize) + 1}: ${students.length} valid students`);
-
-                    if (students.length > 0) {
-                        const { error } = await supabase
-                            .from('students')
-                            .upsert(students, { onConflict: 'school_id,matric_number' });
-
-                        if (error) {
-                            console.error(`Batch ${Math.floor(i / batchSize) + 1} error:`, error);
-                            errorCount += students.length;
-                            errors.push(`Batch ${Math.floor(i / batchSize) + 1}: ${error.message}`);
-                        } else {
-                            successCount += students.length;
-                            console.log(`Batch ${Math.floor(i / batchSize) + 1} success: ${students.length} students`);
-                        }
-                    }
 
                     console.log(`Batch ${Math.floor(i / batchSize) + 1}: ${students.length} valid students`);
 
@@ -3173,6 +3195,11 @@
                 Notes: record.notes || ''
             }));
 
+            if (data.length === 0) {
+                alert('No attendance records found for today.');
+                return;
+            }
+
             if (format === 'csv') {
                 const csv = [Object.keys(data[0]).join(',')];
                 data.forEach(row => {
@@ -3272,12 +3299,6 @@
                     is_admin: true
                 });
 
-                // Clear school name from localStorage
-                localStorage.removeItem('schoolName');
-                const schoolNameDisplay = document.getElementById('school-name-display');
-                if (schoolNameDisplay) {
-                    schoolNameDisplay.textContent = 'University of Lagos';
-                }
 
                 alert('All data cleared successfully. You can now import data for a new school.');
                 location.reload(); // Refresh to reset counters
@@ -3537,39 +3558,6 @@
             setTimeout(() => statusEl.classList.add('hidden'), 5000);
         }
 
-        function updateHeaderSchoolName(schoolName) {
-            const schoolNameDisplay = document.getElementById('school-name-display');
-            if (schoolNameDisplay) {
-                schoolNameDisplay.textContent = schoolName;
-                console.log('Updated header school name to:', schoolName);
-                return true;
-            } else {
-                console.warn('Could not find school-name-display element');
-                return false;
-            }
-        }
-
-        function waitForElementAndUpdate(elementId, schoolName, maxAttempts = 10) {
-            let attempts = 0;
-
-            const tryUpdate = () => {
-                attempts++;
-                const element = document.getElementById(elementId);
-                if (element) {
-                    element.textContent = schoolName;
-                    console.log('Updated header school name to:', schoolName, 'on attempt', attempts);
-                    return; // Success
-                }
-
-                if (attempts < maxAttempts) {
-                    setTimeout(tryUpdate, 100 * attempts); // Increasing delay
-                } else {
-                    console.error('Failed to update school name after', maxAttempts, 'attempts');
-                }
-            };
-
-            tryUpdate();
-        }
 
         // Add student modal functions
         function showAddStudentModal() {
@@ -4078,6 +4066,10 @@
         }
 
         function exportToCSV(data, filename) {
+            if (data.length === 0) {
+                alert('No data to export.');
+                return;
+            }
             const csv = [Object.keys(data[0]).join(',')];
             data.forEach(row => {
                 csv.push(Object.values(row).map(v => `"${v}"`).join(','));
