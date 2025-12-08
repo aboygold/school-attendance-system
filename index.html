@@ -2235,7 +2235,7 @@
                 .from('operators')
                 .select('*')
                 .eq('auth_uid', user.id)
-                .single();
+                .maybeSingle();
 
             console.log('Operator lookup result:', operator, error);
 
@@ -2304,7 +2304,11 @@
             // Set default attendance import date to today
             document.getElementById('attendance-date-input').valueAsDate = new Date();
 
-            startRealtime();
+            try {
+                startRealtime();
+            } catch (error) {
+                console.log('Realtime subscription failed, continuing without it:', error);
+            }
             updateCounters();
         }
 
