@@ -3580,11 +3580,6 @@
             const matric = document.getElementById('new-matric').value.trim();
             const lastName = document.getElementById('new-last-name').value.trim();
             const otherNames = document.getElementById('new-other-names').value.trim();
-            const faculty = document.getElementById('new-faculty').value.trim();
-            const department = document.getElementById('new-department').value.trim();
-            const grade = document.getElementById('new-grade').value.trim();
-            const source = document.getElementById('new-source').value.trim();
-            const nextOfKin = document.getElementById('new-next-of-kin').value.trim();
             const phone = document.getElementById('new-phone').value.trim();
 
             if (!matric || !lastName || !otherNames || !phone) {
@@ -3600,11 +3595,6 @@
                         matric_number: matric,
                         last_name: lastName,
                         other_names: otherNames,
-                        faculty: faculty || null,
-                        department: department || null,
-                        grade: grade || null,
-                        source: source || null,
-                        next_of_kin: nextOfKin || null,
                         phone: phone
                     });
 
