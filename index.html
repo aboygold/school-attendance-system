@@ -661,6 +661,16 @@
             .operator-info {
                 align-items: center;
             }
+
+            /* Improve form layouts on tablets */
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
         }
 
         @media (max-width: 768px) {
@@ -682,17 +692,20 @@
                 font-size: 0.8rem;
             }
 
+            /* Mobile navigation improvements */
             .nav {
                 flex-wrap: wrap;
                 gap: 0.5rem;
                 margin-bottom: 2rem;
+                justify-content: center;
             }
 
             .nav-btn {
-                padding: 0.75rem 1rem;
-                font-size: 0.8rem;
+                padding: 0.875rem 1.25rem;
+                font-size: 0.85rem;
                 flex: 1;
-                min-width: 120px;
+                min-width: 140px;
+                max-width: 180px;
             }
 
             .grid-2,
@@ -728,13 +741,31 @@
                 margin-bottom: 1.5rem;
             }
 
+            /* Enhanced table responsiveness */
+            .table-responsive {
+                border-radius: 0.5rem;
+                box-shadow: var(--shadow-sm);
+                -webkit-overflow-scrolling: touch;
+            }
+
             .table {
                 font-size: 0.8rem;
+                min-width: 800px;
+                /* Ensure minimum width for scrolling */
             }
 
             .table th,
             .table td {
-                padding: 0.5rem 0.75rem;
+                padding: 0.75rem 0.5rem;
+                white-space: nowrap;
+            }
+
+            .table th {
+                position: sticky;
+                top: 0;
+                background: var(--tertiary-bg);
+                z-index: 10;
+                font-size: 0.75rem;
             }
 
             input,
@@ -747,6 +778,29 @@
 
             .form-group {
                 margin-bottom: 1rem;
+            }
+
+            /* Improve attendance form for mobile */
+            #attendance .card {
+                padding: 1.5rem 1rem;
+            }
+
+            #attendance .form-group label {
+                font-size: 0.9rem;
+                margin-bottom: 0.75rem;
+            }
+
+            #attendance input,
+            #attendance select {
+                padding: 1rem 0.875rem;
+            }
+
+            #attendance .grid-2 {
+                gap: 0.75rem;
+            }
+
+            #attendance .grid-2 .form-group {
+                margin-bottom: 0.75rem;
             }
         }
 
@@ -792,6 +846,57 @@
             .table td {
                 padding: 0.5rem;
                 font-size: 0.75rem;
+            }
+
+            /* Extra small screen optimizations */
+            .dashboard-header h2 {
+                font-size: 1.75rem;
+            }
+
+            .metric-card {
+                padding: 1rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 0.75rem;
+            }
+
+            .metric-icon {
+                font-size: 1.75rem;
+            }
+
+            .metric-value {
+                font-size: 1.75rem;
+            }
+
+            /* Modal improvements for small screens */
+            .modal-content {
+                margin: 1rem;
+                max-width: calc(100vw - 2rem);
+                max-height: calc(100vh - 2rem);
+            }
+
+            .modal-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .modal-body {
+                padding: 1.5rem 1rem;
+            }
+
+            /* Form improvements for very small screens */
+            .form-group {
+                margin-bottom: 0.875rem;
+            }
+
+            input,
+            select,
+            textarea {
+                padding: 0.875rem 0.75rem;
+            }
+
+            button {
+                padding: 0.875rem 1rem;
+                font-size: 0.9rem;
             }
         }
 
@@ -854,6 +959,57 @@
         button {
             font-size: 16px;
             /* Prevents zoom on iOS */
+        }
+
+        /* Mobile-specific improvements */
+        @media (max-width: 768px) {
+
+            /* Improve scrolling on mobile */
+            body {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Better modal experience on mobile */
+            .modal {
+                align-items: flex-start;
+                padding-top: 2rem;
+            }
+
+            .modal-content {
+                margin-top: 0;
+                border-radius: 1rem 1rem 0 0;
+                max-height: calc(100vh - 2rem);
+            }
+
+            /* Improve select dropdowns on mobile */
+            select {
+                appearance: none;
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right 0.75rem center;
+                background-size: 1rem;
+                padding-right: 2.5rem;
+            }
+
+            /* Better focus states for mobile */
+            input:focus,
+            select:focus,
+            textarea:focus {
+                outline: 3px solid var(--accent-primary);
+                outline-offset: 2px;
+            }
+
+            /* Improve button spacing on mobile */
+            .grid.grid-3 .btn-primary {
+                margin-bottom: 0.5rem;
+            }
+
+            /* Better spacing for form elements */
+            .form-group label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+            }
         }
 
         /* Print Styles */
