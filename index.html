@@ -3922,6 +3922,12 @@
 
                 // Refresh dashboard data
                 loadDashboardData();
+
+                // Scroll to matric input field for next entry
+                setTimeout(() => {
+                    matricInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    matricInput.focus();
+                }, 500);
             } catch (error) {
                 console.error('Error marking attendance:', error);
                 showStatus('❌ Error marking attendance: ' + error.message, 'error');
