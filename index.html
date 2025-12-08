@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,9 @@
     <meta name="theme-color" content="#0a0a0f">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="mobile-web-app-capable" content="yes">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -257,7 +261,8 @@
             left: 100%;
         }
 
-        .nav-btn:hover, .nav-btn.active {
+        .nav-btn:hover,
+        .nav-btn.active {
             background: var(--gradient-primary);
             border-color: var(--accent-primary);
             box-shadow: 0 0 25px rgba(99, 102, 241, 0.3);
@@ -281,8 +286,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Form Elements */
@@ -299,7 +311,10 @@
             letter-spacing: 0.025em;
         }
 
-        input, select, textarea, button {
+        input,
+        select,
+        textarea,
+        button {
             width: 100%;
             padding: 0.875rem 1rem;
             background: var(--secondary-bg);
@@ -311,7 +326,9 @@
             font-family: inherit;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: var(--accent-primary);
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
@@ -455,7 +472,8 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        .table th, .table td {
+        .table th,
+        .table td {
             padding: 1rem 1.5rem;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
@@ -531,8 +549,59 @@
             animation: spin 1s linear infinite;
         }
 
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+
+        .loading-text {
+            color: var(--text-primary);
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        /* Skeleton loading */
+        .skeleton {
+            background: linear-gradient(90deg, var(--secondary-bg) 25%, var(--tertiary-bg) 50%, var(--secondary-bg) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+
+        @keyframes skeleton-loading {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .skeleton-card {
+            height: 120px;
+            border-radius: 1rem;
+        }
+
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Utility Classes */
@@ -626,7 +695,8 @@
                 min-width: 120px;
             }
 
-            .grid-2, .grid-3 {
+            .grid-2,
+            .grid-3 {
                 grid-template-columns: 1fr;
                 gap: 1rem;
             }
@@ -662,12 +732,17 @@
                 font-size: 0.8rem;
             }
 
-            .table th, .table td {
+            .table th,
+            .table td {
                 padding: 0.5rem 0.75rem;
             }
 
-            input, select, textarea, button {
-                font-size: 16px; /* Prevents zoom on iOS */
+            input,
+            select,
+            textarea,
+            button {
+                font-size: 16px;
+                /* Prevents zoom on iOS */
             }
 
             .form-group {
@@ -713,7 +788,8 @@
                 padding: 1rem;
             }
 
-            .table th, .table td {
+            .table th,
+            .table td {
                 padding: 0.5rem;
                 font-size: 0.75rem;
             }
@@ -730,20 +806,54 @@
             text-rendering: optimizeLegibility;
         }
 
-        .card, .nav-btn, .counter {
+        .card,
+        .nav-btn,
+        .counter {
             will-change: transform;
-            transform: translateZ(0); /* Hardware acceleration */
+            transform: translateZ(0);
+            /* Hardware acceleration */
         }
 
         /* Touch optimizations */
         @media (hover: none) and (pointer: coarse) {
-            .nav-btn:hover, .counter:hover, .card:hover {
+
+            .nav-btn:hover,
+            .counter:hover,
+            .card:hover,
+            .btn-primary:hover,
+            .btn-danger:hover {
                 transform: none;
             }
 
-            .nav-btn:active, .counter:active {
+            .nav-btn:active,
+            .counter:active,
+            .btn-primary:active,
+            .btn-danger:active {
                 transform: scale(0.98);
+                transition: transform 0.1s ease;
             }
+
+            .card:active {
+                transform: scale(0.99);
+            }
+        }
+
+        /* Better touch targets */
+        .nav-btn,
+        .btn-primary,
+        .btn-danger,
+        .btn-link {
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        /* Improve form inputs on mobile */
+        input,
+        select,
+        textarea,
+        button {
+            font-size: 16px;
+            /* Prevents zoom on iOS */
         }
 
         /* Print Styles */
@@ -753,7 +863,9 @@
                 color: black !important;
             }
 
-            .nav, .btn, header {
+            .nav,
+            .btn,
+            header {
                 display: none !important;
             }
 
@@ -872,8 +984,15 @@
         }
 
         @keyframes slideIn {
-            from { transform: scale(0.9) translateY(-20px); opacity: 0; }
-            to { transform: scale(1) translateY(0); opacity: 1; }
+            from {
+                transform: scale(0.9) translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
         }
 
         .modal-header {
@@ -1098,7 +1217,14 @@
         }
     </style>
 </head>
+
 <body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading" style="width: 3rem; height: 3rem;"></div>
+        <div class="loading-text">Initializing School Attendance System...</div>
+    </div>
+
     <div class="container">
         <header>
             <div class="brand-section">
@@ -1246,8 +1372,10 @@
                         <label for="student-name">Student Name</label>
                         <input type="text" id="student-name" readonly>
                         <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-                            <button type="button" id="add-student-btn" class="btn-primary" style="display: none;">Add New Student</button>
-                            <button type="button" id="edit-student-btn" class="btn-primary" style="display: none;">Edit Student</button>
+                            <button type="button" id="add-student-btn" class="btn-primary" style="display: none;">Add
+                                New Student</button>
+                            <button type="button" id="edit-student-btn" class="btn-primary" style="display: none;">Edit
+                                Student</button>
                         </div>
                     </div>
                     <div class="grid grid-2">
@@ -1272,13 +1400,13 @@
                             <input type="text" id="student-next-of-kin" readonly>
                         </div>
                         <div class="form-group">
-                            <label for="phone-input">Phone Number</label>
-                            <input type="tel" id="phone-input" placeholder="Phone number (optional)">
+                            <label for="phone-input">Phone Number *</label>
+                            <input type="tel" id="phone-input" placeholder="Phone number (required)" required>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="notes-input">Notes</label>
-                        <textarea id="notes-input" rows="2" placeholder="Optional notes"></textarea>
+                        <label for="notes-input">Notes (optional)</label>
+                        <textarea id="notes-input" placeholder="Additional notes" rows="2"></textarea>
                     </div>
                     <button type="submit" class="btn-primary" id="mark-btn">Mark Attendance</button>
                 </form>
@@ -1306,17 +1434,33 @@
                 </div>
 
                 <div class="card">
-                    <h3>Import Attendance Records</h3>
+                    <h3>Import/Update Student Records</h3>
+                    <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.875rem;">For attendance
+                        tracking, only records with phone numbers will be processed. Use this for importing attendance
+                        data or updating student information with phone numbers.</p>
                     <form id="attendance-import-form">
                         <div class="form-group">
                             <label for="attendance-file-input">Select CSV or XLSX file</label>
                             <input type="file" id="attendance-file-input" accept=".csv,.xlsx,.xls" required>
                         </div>
                         <div class="form-group">
-                            <label for="attendance-date-input">Attendance Date</label>
-                            <input type="date" id="attendance-date-input" required>
+                            <label for="attendance-date-input">Attendance Date (optional - for attendance
+                                records)</label>
+                            <input type="date" id="attendance-date-input">
                         </div>
-                        <button type="submit" class="btn-primary">Import Attendance</button>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="update-student-info" checked>
+                                Update student information (faculty, department, etc.)
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="import-attendance-records" checked>
+                                Import attendance records
+                            </label>
+                        </div>
+                        <button type="submit" class="btn-primary">Import/Update Records</button>
                     </form>
                     <div id="attendance-import-status"></div>
                     <div id="attendance-import-progress" class="hidden">
@@ -1363,7 +1507,8 @@
                 </div>
                 <div class="grid grid-2" style="margin-top: 1rem;">
                     <button id="clear-data-reports-btn" class="btn-danger">Clear All Data</button>
-                    <div style="font-size: 0.8rem; color: #666;">⚠️ This will delete all students and attendance records</div>
+                    <div style="font-size: 0.8rem; color: #666;">⚠️ This will delete all students and attendance records
+                    </div>
                 </div>
                 <div id="report-table-container" class="hidden">
                     <div class="table-responsive">
@@ -1494,12 +1639,16 @@
                     <button class="modal-close" id="export-templates-close">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <p style="margin-bottom: 1rem; color: var(--text-secondary);">Choose a pre-configured export template:</p>
+                    <p style="margin-bottom: 1rem; color: var(--text-secondary);">Choose a pre-configured export
+                        template:</p>
                     <div class="grid grid-2">
                         <button class="btn-primary template-btn" data-template="daily-report">📊 Daily Report</button>
-                        <button class="btn-primary template-btn" data-template="weekly-summary">📈 Weekly Summary</button>
-                        <button class="btn-primary template-btn" data-template="faculty-report">🏛️ Faculty Report</button>
-                        <button class="btn-primary template-btn" data-template="operator-performance">👤 Operator Performance</button>
+                        <button class="btn-primary template-btn" data-template="weekly-summary">📈 Weekly
+                            Summary</button>
+                        <button class="btn-primary template-btn" data-template="faculty-report">🏛️ Faculty
+                            Report</button>
+                        <button class="btn-primary template-btn" data-template="operator-performance">👤 Operator
+                            Performance</button>
                         <button class="btn-primary template-btn" data-template="absentee-list">❌ Absentee List</button>
                         <button class="btn-primary template-btn" data-template="late-arrivals">⏰ Late Arrivals</button>
                     </div>
@@ -1535,12 +1684,6 @@
                             <label for="new-phone">Phone Number *</label>
                             <input type="tel" id="new-phone" required>
                         </div>
-                        <!-- Hidden optional fields -->
-                        <input type="hidden" id="new-faculty">
-                        <input type="hidden" id="new-department">
-                        <input type="hidden" id="new-grade">
-                        <input type="hidden" id="new-source">
-                        <input type="hidden" id="new-next-of-kin">
                         <button type="submit" class="btn-primary">Add Student</button>
                     </form>
                     <div id="add-student-status" class="hidden"></div>
@@ -1573,21 +1716,21 @@
                         </div>
                         <div class="grid grid-2">
                             <div class="form-group">
-                                <label for="edit-faculty">Faculty (optional)</label>
+                                <label for="edit-faculty">Faculty</label>
                                 <input type="text" id="edit-faculty">
                             </div>
                             <div class="form-group">
-                                <label for="edit-department">Department (optional)</label>
+                                <label for="edit-department">Department</label>
                                 <input type="text" id="edit-department">
                             </div>
                         </div>
                         <div class="grid grid-3">
                             <div class="form-group">
-                                <label for="edit-grade">Grade (optional)</label>
+                                <label for="edit-grade">Grade</label>
                                 <input type="text" id="edit-grade">
                             </div>
                             <div class="form-group">
-                                <label for="edit-source">Source (optional)</label>
+                                <label for="edit-source">Source</label>
                                 <input type="text" id="edit-source">
                             </div>
                             <div class="form-group">
@@ -1596,7 +1739,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="edit-next-of-kin">Next of Kin (optional)</label>
+                            <label for="edit-next-of-kin">Next of Kin</label>
                             <input type="text" id="edit-next-of-kin">
                         </div>
                         <button type="submit" class="btn-primary">Update Student</button>
@@ -1614,7 +1757,8 @@
                     <button class="modal-close" id="complete-student-close">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <p style="margin-bottom: 1rem; color: var(--text-secondary);">Please fill in the missing information for <strong id="complete-student-name"></strong> before marking attendance:</p>
+                    <p style="margin-bottom: 1rem; color: var(--text-secondary);">Please fill in the missing information
+                        for <strong id="complete-student-name"></strong> before marking attendance:</p>
                     <form id="complete-student-form">
                         <input type="hidden" id="complete-matric">
                         <div class="grid grid-2">
@@ -1643,12 +1787,13 @@
                                 <input type="text" id="complete-next-of-kin" required>
                             </div>
                             <div class="form-group">
-                                <label for="complete-phone">Phone</label>
-                                <input type="tel" id="complete-phone">
+                                <label for="complete-phone">Phone *</label>
+                                <input type="tel" id="complete-phone" required>
                             </div>
                         </div>
                         <div class="grid grid-2">
-                            <button type="button" id="skip-complete-btn" class="btn-danger">Skip & Mark Attendance</button>
+                            <button type="button" id="skip-complete-btn" class="btn-danger">Skip & Mark
+                                Attendance</button>
                             <button type="submit" class="btn-primary">Complete & Mark Attendance</button>
                         </div>
                     </form>
@@ -1692,9 +1837,6 @@
                             </div>
                             <div class="shortcut-item">
                                 <kbd>Alt+P</kbd> <span>Focus Phone Input</span>
-                            </div>
-                            <div class="shortcut-item">
-                                <kbd>Alt+N</kbd> <span>Focus Notes Input</span>
                             </div>
                             <div class="shortcut-item">
                                 <kbd>Enter</kbd> <span>Submit Attendance</span>
@@ -1845,6 +1987,7 @@
             } else {
                 console.log('No authenticated user, showing login');
                 showAuthSection('login');
+                document.getElementById('loading-overlay').classList.add('hidden');
             }
 
             // Event listeners
@@ -1918,6 +2061,9 @@
 
             // Load initial dashboard data
             await loadDashboardData();
+
+            // Hide loading overlay
+            document.getElementById('loading-overlay').classList.add('hidden');
 
             // Set default report date to today
             document.getElementById('report-date').valueAsDate = new Date();
@@ -2107,11 +2253,11 @@
                 const today = new Date().toISOString().split('T')[0];
                 const { data: existingAttendance, error: attendanceError } = await supabase
                     .from('attendance')
-                    .select('ts, operators(name)')
+                    .select('ts')
                     .eq('school_id', currentSchool.id)
                     .eq('matric_number', matric)
                     .eq('attendance_date', today)
-                    .single();
+                    .maybeSingle();
 
 
                 if (existingAttendance && !attendanceError) {
@@ -2126,7 +2272,6 @@
                     document.getElementById('attendance-status').innerHTML = `
                         <div class="status error">
                             ⚠️ <strong>${student.name}</strong> already marked attendance today at ${timeString}
-                            ${existingAttendance.operators ? ` by ${existingAttendance.operators.name}` : ''}
                         </div>
                     `;
                     document.getElementById('attendance-status').classList.remove('hidden');
@@ -2183,6 +2328,13 @@
 
             if (!matric || !currentSchool) return;
 
+            // Validate that phone number is provided
+            if (!phone) {
+                showStatus('❌ Phone number is required to mark attendance.', 'error');
+                phoneInput.focus();
+                return;
+            }
+
             // Double-check if already marked today before submitting
             const today = new Date().toISOString().split('T')[0];
             const { data: existingAttendance } = await supabase
@@ -2191,7 +2343,7 @@
                 .eq('school_id', currentSchool.id)
                 .eq('matric_number', matric)
                 .eq('attendance_date', today)
-                .single();
+                .maybeSingle();
 
             if (existingAttendance) {
                 showStatus('⚠️ This student has already been marked for attendance today!', 'error');
@@ -2289,8 +2441,10 @@
                 const data = e.target.result;
                 let headers;
                 if (file.name.endsWith('.csv')) {
-                    const csvData = XLSX.utils.csv_to_sheet(data);
-                    headers = XLSX.utils.sheet_to_json(csvData, { header: 1 })[0];
+                    // Parse CSV manually
+                    const lines = data.split('\n').filter(line => line.trim());
+                    const firstLine = lines[0];
+                    headers = firstLine.split(',').map(cell => cell.replace(/^"|"$/g, '').trim());
                 } else {
                     const workbook = XLSX.read(data, { type: 'binary' });
                     const sheetName = workbook.SheetNames[0];
@@ -2314,8 +2468,9 @@
             let data;
             if (file.name.endsWith('.csv')) {
                 const text = await file.text();
-                data = XLSX.utils.csv_to_sheet(text);
-                data = XLSX.utils.sheet_to_json(data, { header: 1, defval: null });
+                // Parse CSV manually
+                const lines = text.split('\n').filter(line => line.trim());
+                data = lines.map(line => line.split(',').map(cell => cell.replace(/^"|"$/g, '').trim()));
             } else {
                 const arrayBuffer = await file.arrayBuffer();
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
@@ -2384,7 +2539,7 @@
 
                 for (let i = 0; i < data.length; i += batchSize) {
                     const batch = data.slice(i, i + batchSize);
-                    console.log(`Processing batch ${Math.floor(i/batchSize) + 1}, rows ${i} to ${i + batch.length - 1}`);
+                    console.log(`Processing batch ${Math.floor(i / batchSize) + 1}, rows ${i} to ${i + batch.length - 1}`);
                     const students = batch.map(row => ({
                         school_id: currentSchool.id,
                         matric_number: row[matricCol]?.toString().trim(),
@@ -2398,7 +2553,7 @@
                         phone: phoneCol !== -1 ? row[phoneCol]?.toString().trim() : null
                     })).filter(s => s.matric_number && s.last_name && s.other_names);
 
-                    console.log(`Batch ${Math.floor(i/batchSize) + 1}: ${students.length} valid students`);
+                    console.log(`Batch ${Math.floor(i / batchSize) + 1}: ${students.length} valid students`);
 
                     if (students.length > 0) {
                         const { error } = await supabase
@@ -2406,12 +2561,29 @@
                             .upsert(students, { onConflict: 'school_id,matric_number' });
 
                         if (error) {
-                            console.error(`Batch ${Math.floor(i/batchSize) + 1} error:`, error);
+                            console.error(`Batch ${Math.floor(i / batchSize) + 1} error:`, error);
                             errorCount += students.length;
-                            errors.push(`Batch ${Math.floor(i/batchSize) + 1}: ${error.message}`);
+                            errors.push(`Batch ${Math.floor(i / batchSize) + 1}: ${error.message}`);
                         } else {
                             successCount += students.length;
-                            console.log(`Batch ${Math.floor(i/batchSize) + 1} success: ${students.length} students`);
+                            console.log(`Batch ${Math.floor(i / batchSize) + 1} success: ${students.length} students`);
+                        }
+                    }
+
+                    console.log(`Batch ${Math.floor(i / batchSize) + 1}: ${students.length} valid students`);
+
+                    if (students.length > 0) {
+                        const { error } = await supabase
+                            .from('students')
+                            .upsert(students, { onConflict: 'school_id,matric_number' });
+
+                        if (error) {
+                            console.error(`Batch ${Math.floor(i / batchSize) + 1} error:`, error);
+                            errorCount += students.length;
+                            errors.push(`Batch ${Math.floor(i / batchSize) + 1}: ${error.message}`);
+                        } else {
+                            successCount += students.length;
+                            console.log(`Batch ${Math.floor(i / batchSize) + 1} success: ${students.length} students`);
                         }
                     }
 
@@ -2442,15 +2614,26 @@
             e.preventDefault();
             const file = document.getElementById('attendance-file-input').files[0];
             const attendanceDate = document.getElementById('attendance-date-input').value;
+            const updateStudentInfo = document.getElementById('update-student-info').checked;
+            const importAttendance = document.getElementById('import-attendance-records').checked;
 
-            if (!file || !attendanceDate) return;
+            if (!file) return;
+            if (importAttendance && !attendanceDate) {
+                alert('Please select an attendance date for importing attendance records.');
+                return;
+            }
+            if (!updateStudentInfo && !importAttendance) {
+                alert('Please select at least one option: update student info or import attendance records.');
+                return;
+            }
 
             // Parse file
             let data;
             if (file.name.endsWith('.csv')) {
                 const text = await file.text();
-                data = XLSX.utils.csv_to_sheet(text);
-                data = XLSX.utils.sheet_to_json(data, { header: 1, defval: null });
+                // Parse CSV manually since XLSX csv_to_sheet might not be available
+                const lines = text.split('\n').filter(line => line.trim());
+                data = lines.map(line => line.split(',').map(cell => cell.replace(/^"|"$/g, '').trim()));
             } else {
                 const arrayBuffer = await file.arrayBuffer();
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
@@ -2478,8 +2661,25 @@
             const phoneCol = findColumn(['phone', 'mobile', 'contact']);
             const notesCol = findColumn(['notes', 'comment']);
 
+            // Student info columns (only needed if updating student info)
+            let facultyCol = -1, departmentCol = -1, gradeCol = -1, sourceCol = -1, nextOfKinCol = -1, lastNameCol = -1, otherNamesCol = -1;
+            if (updateStudentInfo) {
+                facultyCol = findColumn(['faculty']);
+                departmentCol = findColumn(['department']);
+                gradeCol = findColumn(['grade', 'level', 'class']);
+                sourceCol = findColumn(['source']);
+                nextOfKinCol = findColumn(['next', 'kin', 'guardian']);
+                lastNameCol = findColumn(['last', 'surname']);
+                otherNamesCol = findColumn(['other', 'first', 'given']);
+            }
+
             if (matricCol === -1) {
                 alert('Could not auto-detect required column. CSV must include at least: matric number.');
+                return;
+            }
+
+            if (updateStudentInfo && lastNameCol === -1 && otherNamesCol === -1) {
+                alert('For updating student info, CSV should include name columns (last name, other names).');
                 return;
             }
 
@@ -2495,72 +2695,160 @@
                 // Get current operator for attendance records
                 const operatorId = currentOperator?.id || '00000000-0000-0000-0000-000000000001';
 
-                // Batch process attendance records
+                // Batch process records
                 const batchSize = 500;
-                let successCount = 0;
+                let studentUpdateCount = 0;
+                let attendanceImportCount = 0;
                 let errorCount = 0;
                 const errors = [];
-                console.log('Starting attendance batch processing...');
+                console.log('Starting batch processing...');
 
                 for (let i = 0; i < data.length; i += batchSize) {
                     const batch = data.slice(i, i + batchSize);
-                    console.log(`Processing attendance batch ${Math.floor(i/batchSize) + 1}, rows ${i} to ${i + batch.length - 1}`);
+                    console.log(`Processing batch ${Math.floor(i / batchSize) + 1}, rows ${i} to ${i + batch.length - 1}`);
 
-                    const attendanceRecords = batch.map(row => ({
-                        school_id: currentSchool.id,
-                        matric_number: row[matricCol]?.toString().trim(),
-                        attendance_date: attendanceDate,
-                        ts: timeCol !== -1 && row[timeCol] ? new Date(row[timeCol]).toISOString() : new Date().toISOString(),
-                        operator_id: operatorId,
-                        phone_captured: phoneCol !== -1 ? row[phoneCol]?.toString().trim() : null,
-                        notes: notesCol !== -1 ? row[notesCol]?.toString().trim() : null
-                    })).filter(record => record.matric_number);
+                    const matricNumbers = batch.map(row => row[matricCol]?.toString().trim()).filter(m => m);
 
-                    console.log(`Attendance batch ${Math.floor(i/batchSize) + 1}: ${attendanceRecords.length} valid records`);
+                    if (matricNumbers.length === 0) {
+                        console.log(`Batch ${Math.floor(i / batchSize) + 1}: No valid matric numbers found, skipping`);
+                        continue;
+                    }
 
-                    if (attendanceRecords.length > 0) {
-                        // Check if students exist first
-                        const matricNumbers = attendanceRecords.map(r => r.matric_number);
-                        const { data: existingStudents, error: studentCheckError } = await supabase
-                            .from('students')
-                            .select('matric_number')
-                            .eq('school_id', currentSchool.id)
-                            .in('matric_number', matricNumbers);
+                    // Check if students exist
+                    const { data: existingStudents, error: studentCheckError } = await supabase
+                        .from('students')
+                        .select('matric_number')
+                        .eq('school_id', currentSchool.id)
+                        .in('matric_number', matricNumbers);
 
-                        if (studentCheckError) {
-                            console.error('Error checking students:', studentCheckError);
-                            errorCount += attendanceRecords.length;
-                            errors.push(`Batch ${Math.floor(i/batchSize) + 1}: Student check failed - ${studentCheckError.message}`);
-                            continue;
-                        }
+                    if (studentCheckError) {
+                        console.error('Error checking students:', studentCheckError);
+                        errorCount += matricNumbers.length;
+                        errors.push(`Batch ${Math.floor(i / batchSize) + 1}: Student check failed - ${studentCheckError.message}`);
+                        continue;
+                    }
 
-                        const existingMatrics = new Set(existingStudents.map(s => s.matric_number));
-                        const validRecords = attendanceRecords.filter(r => existingMatrics.has(r.matric_number));
+                    const existingMatrics = new Set(existingStudents.map(s => s.matric_number));
+                    console.log(`Batch ${Math.floor(i / batchSize) + 1}: Found ${existingMatrics.size} existing students out of ${matricNumbers.length}`);
 
-                        console.log(`Batch ${Math.floor(i/batchSize) + 1}: ${validRecords.length} records with existing students`);
+                    // Update student information if enabled
+                    if (updateStudentInfo) {
+                        const studentUpdates = batch
+                            .filter(row => {
+                                const matric = row[matricCol]?.toString().trim();
+                                return matric && existingMatrics.has(matric);
+                            })
+                            .map(row => {
+                                const matric = row[matricCol]?.toString().trim();
+                                const update = { matric_number: matric };
 
-                        if (validRecords.length > 0) {
-                            const { error } = await supabase
-                                .from('attendance')
-                                .upsert(validRecords, {
-                                    onConflict: 'school_id,matric_number,attendance_date',
-                                    ignoreDuplicates: false
-                                });
+                                if (lastNameCol !== -1 && row[lastNameCol]) {
+                                    update.last_name = row[lastNameCol]?.toString().trim();
+                                }
+                                if (otherNamesCol !== -1 && row[otherNamesCol]) {
+                                    update.other_names = row[otherNamesCol]?.toString().trim();
+                                }
+                                if (facultyCol !== -1) {
+                                    update.faculty = row[facultyCol]?.toString().trim() || null;
+                                }
+                                if (departmentCol !== -1) {
+                                    update.department = row[departmentCol]?.toString().trim() || null;
+                                }
+                                if (gradeCol !== -1) {
+                                    update.grade = row[gradeCol]?.toString().trim() || null;
+                                }
+                                if (sourceCol !== -1) {
+                                    update.source = row[sourceCol]?.toString().trim() || null;
+                                }
+                                if (nextOfKinCol !== -1) {
+                                    update.next_of_kin = row[nextOfKinCol]?.toString().trim() || null;
+                                }
+                                if (phoneCol !== -1) {
+                                    update.phone = row[phoneCol]?.toString().trim() || null;
+                                }
 
-                            if (error) {
-                                console.error(`Attendance batch ${Math.floor(i/batchSize) + 1} error:`, error);
-                                errorCount += validRecords.length;
-                                errors.push(`Batch ${Math.floor(i/batchSize) + 1}: ${error.message}`);
+                                update.updated_at = new Date().toISOString();
+                                return update;
+                            })
+                            .filter(update => Object.keys(update).length > 2); // More than just matric and updated_at
+
+                        if (studentUpdates.length > 0) {
+                            console.log(`Batch ${Math.floor(i / batchSize) + 1}: Updating ${studentUpdates.length} student records`);
+                            const { error: updateError } = await supabase
+                                .from('students')
+                                .upsert(studentUpdates, { onConflict: 'school_id,matric_number' });
+
+                            if (updateError) {
+                                console.error(`Student update batch ${Math.floor(i / batchSize) + 1} error:`, updateError);
+                                errorCount += studentUpdates.length;
+                                errors.push(`Batch ${Math.floor(i / batchSize) + 1}: Student update failed - ${updateError.message}`);
                             } else {
-                                successCount += validRecords.length;
-                                console.log(`Attendance batch ${Math.floor(i/batchSize) + 1} success: ${validRecords.length} records`);
+                                studentUpdateCount += studentUpdates.length;
+                                console.log(`Student update batch ${Math.floor(i / batchSize) + 1} success: ${studentUpdates.length} records`);
                             }
                         }
+                    }
 
-                        const invalidCount = attendanceRecords.length - validRecords.length;
-                        if (invalidCount > 0) {
-                            errorCount += invalidCount;
-                            errors.push(`Batch ${Math.floor(i/batchSize) + 1}: ${invalidCount} records skipped (students not found)`);
+                    // Import attendance records if enabled
+                    if (importAttendance && attendanceDate) {
+                        // Get student IDs for the matric numbers in this batch
+                        const matricNumbersInBatch = batch
+                            .map(row => row[matricCol]?.toString().trim())
+                            .filter(matric => matric && existingMatrics.has(matric));
+
+                        if (matricNumbersInBatch.length > 0) {
+                            const { data: studentsInBatch, error: studentLookupError } = await supabase
+                                .from('students')
+                                .select('id, matric_number')
+                                .eq('school_id', currentSchool.id)
+                                .in('matric_number', matricNumbersInBatch);
+
+                            if (studentLookupError) {
+                                console.error('Error looking up students:', studentLookupError);
+                                errorCount += matricNumbersInBatch.length;
+                                errors.push(`Batch ${Math.floor(i / batchSize) + 1}: Student lookup failed - ${studentLookupError.message}`);
+                                continue;
+                            }
+
+                            const studentIdMap = new Map(studentsInBatch.map(s => [s.matric_number, s.id]));
+
+                            const attendanceRecords = batch
+                                .filter(row => {
+                                    const matric = row[matricCol]?.toString().trim();
+                                    return matric && studentIdMap.has(matric);
+                                })
+                                .map(row => {
+                                    const matric = row[matricCol]?.toString().trim();
+                                    return {
+                                        school_id: currentSchool.id,
+                                        student_id: studentIdMap.get(matric),
+                                        matric_number: matric,
+                                        attendance_date: attendanceDate,
+                                        ts: timeCol !== -1 && row[timeCol] ? new Date(row[timeCol]).toISOString() : new Date().toISOString(),
+                                        operator_id: operatorId,
+                                        phone_captured: phoneCol !== -1 ? row[phoneCol]?.toString().trim() : null,
+                                        notes: notesCol !== -1 ? row[notesCol]?.toString().trim() : null
+                                    };
+                                });
+
+                            if (attendanceRecords.length > 0) {
+                                console.log(`Batch ${Math.floor(i / batchSize) + 1}: Importing ${attendanceRecords.length} attendance records`);
+                                const { error: attendanceError } = await supabase
+                                    .from('attendance')
+                                    .upsert(attendanceRecords, {
+                                        onConflict: 'school_id,student_id,attendance_date',
+                                        ignoreDuplicates: false
+                                    });
+
+                                if (attendanceError) {
+                                    console.error(`Attendance import batch ${Math.floor(i / batchSize) + 1} error:`, attendanceError);
+                                    errorCount += attendanceRecords.length;
+                                    errors.push(`Batch ${Math.floor(i / batchSize) + 1}: Attendance import failed - ${attendanceError.message}`);
+                                } else {
+                                    attendanceImportCount += attendanceRecords.length;
+                                    console.log(`Attendance import batch ${Math.floor(i / batchSize) + 1} success: ${attendanceRecords.length} records`);
+                                }
+                            }
                         }
                     }
 
@@ -2570,7 +2858,13 @@
                     progressText.textContent = `${progress}%`;
                 }
 
-                let statusMessage = `Attendance import completed. ${successCount} records imported successfully.`;
+                let statusMessage = `Import completed.`;
+                if (updateStudentInfo) {
+                    statusMessage += ` ${studentUpdateCount} student records updated.`;
+                }
+                if (importAttendance) {
+                    statusMessage += ` ${attendanceImportCount} attendance records imported.`;
+                }
                 if (errorCount > 0) {
                     statusMessage += ` ${errorCount} errors.`;
                 }
@@ -2708,7 +3002,7 @@
                     phone_captured,
                     ts,
                     notes,
-                    students!inner(name),
+                    students!inner(name, faculty, department, grade, source, next_of_kin, phone),
                     operators(name)
                 `)
                 .eq('school_id', currentSchool.id)
@@ -2951,12 +3245,6 @@
                     e.preventDefault();
                     phoneInput.focus();
                     phoneInput.select();
-                    break;
-                case 'n':
-                case 'N':
-                    e.preventDefault();
-                    notesInput.focus();
-                    notesInput.select();
                     break;
             }
         }
@@ -3211,7 +3499,7 @@
             setTimeout(() => editStudentStatus.classList.add('hidden'), 5000);
         }
 
-        function showCompleteStudentModal(student, phone, notes) {
+        function showCompleteStudentModal(student, phone) {
             document.getElementById('complete-student-name').textContent = `${student.other_names} ${student.last_name}`;
             document.getElementById('complete-matric').value = student.matric_number;
 
@@ -3225,7 +3513,6 @@
 
             // Store additional data for later use
             completeStudentModal._phone = phone;
-            completeStudentModal._notes = notes;
 
             completeStudentModal.classList.remove('hidden');
         }
@@ -3246,10 +3533,9 @@
             const source = document.getElementById('complete-source').value.trim();
             const nextOfKin = document.getElementById('complete-next-of-kin').value.trim();
             const phone = document.getElementById('complete-phone').value.trim();
-            const notes = completeStudentModal._notes;
 
-            if (!faculty || !department || !grade || !source || !nextOfKin) {
-                showCompleteStudentStatus('Please fill in all required fields.', 'error');
+            if (!faculty || !department || !grade || !source || !nextOfKin || !phone) {
+                showCompleteStudentStatus('Please fill in all required fields, including phone number.', 'error');
                 return;
             }
 
@@ -3272,7 +3558,7 @@
                 if (updateError) throw updateError;
 
                 // Mark attendance
-                await markAttendance(matric, phone, notes);
+                await markAttendance(matric, phone, completeStudentModal._notes);
                 hideCompleteStudentModal();
 
             } catch (error) {
@@ -3284,9 +3570,13 @@
         async function handleSkipCompleteAndMarkAttendance() {
             const matric = document.getElementById('complete-matric').value;
             const phone = completeStudentModal._phone;
-            const notes = completeStudentModal._notes;
 
-            await markAttendance(matric, phone, notes);
+            if (!phone) {
+                showCompleteStudentStatus('Phone number is required to mark attendance.', 'error');
+                return;
+            }
+
+            await markAttendance(matric, phone, completeStudentModal._notes);
             hideCompleteStudentModal();
         }
 
@@ -3295,6 +3585,15 @@
             markBtn.innerHTML = '<div class="loading"></div> Marking...';
 
             try {
+                // Update student phone number if provided
+                if (phone) {
+                    await supabase
+                        .from('students')
+                        .update({ phone: phone, updated_at: new Date().toISOString() })
+                        .eq('school_id', currentSchool.id)
+                        .eq('matric_number', matric);
+                }
+
                 const { data, error } = await supabase.rpc('mark_attendance', {
                     p_school_id: currentSchool.id,
                     p_matric: matric,
@@ -3618,7 +3917,7 @@
             document.getElementById('export-end-date').value = endDate;
             document.getElementById('export-format').value = 'xlsx';
             document.getElementById('export-group-by').value = templateType.includes('faculty') ? 'faculty' :
-                                                             templateType.includes('operator') ? 'operator' : 'none';
+                templateType.includes('operator') ? 'operator' : 'none';
             document.getElementById('export-include-summary').checked = true;
 
             // Hide templates modal and show advanced export
@@ -3640,8 +3939,18 @@
             setTimeout(() => advancedExportStatus.classList.add('hidden'), 5000);
         }
 
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(error => console.log('SW registration failed'));
+            });
+        }
+
         // Initialize
         init();
     </script>
 </body>
+
 </html>
