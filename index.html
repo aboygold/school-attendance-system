@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>School Attendance System</title>
     <meta name="theme-color" content="#0a0a0f">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -346,6 +346,9 @@
             font-size: 1rem;
             transition: all 0.2s ease;
             font-family: inherit;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
 
         input:focus,
@@ -995,6 +998,97 @@
         button {
             font-size: 16px;
             /* Prevents zoom on iOS */
+        }
+
+        /* Additional mobile optimizations */
+        @media (max-width: 768px) {
+
+            /* Ensure proper text rendering on mobile */
+            body {
+                -webkit-text-size-adjust: 100%;
+                -ms-text-size-adjust: 100%;
+                text-size-adjust: 100%;
+            }
+
+            /* Better input handling */
+            input[type="text"],
+            input[type="email"],
+            input[type="tel"],
+            input[type="password"],
+            select,
+            textarea {
+                font-size: 16px !important;
+                line-height: 1.4;
+                min-height: 44px;
+                border-radius: 8px;
+            }
+
+            /* Prevent horizontal scroll */
+            html,
+            body {
+                overflow-x: hidden;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            /* Better button handling */
+            button {
+                min-height: 44px;
+                touch-action: manipulation;
+            }
+
+            /* Improve modal experience */
+            .modal-content {
+                margin: 10px;
+                max-height: calc(100vh - 20px);
+                border-radius: 12px;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .nav-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.8rem;
+                min-width: 120px;
+            }
+
+            /* Stack counters vertically on very small screens */
+            .counters {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .counter {
+                padding: 0.75rem;
+                min-width: unset;
+                width: 100%;
+            }
+        }
+
+        /* Landscape orientation fixes */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            header {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
         }
 
         /* Mobile-specific improvements */
