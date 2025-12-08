@@ -2684,6 +2684,7 @@
 
             // Student has complete info, mark attendance directly
             const studentName = studentNameInput.value;
+            console.log('About to mark attendance - matric:', matric, 'studentName:', studentName, 'phone:', phone);
             await markAttendance(matric, phone, notes, studentName);
         }
 
@@ -3921,7 +3922,9 @@
                 if (error) throw error;
 
                 const displayName = studentName || 'Student';
-                showStatus(`✅ Attendance marked successfully for ${displayName} (${matric})!`, 'success');
+                const successMessage = `✅ Attendance marked successfully for ${displayName} (${matric})!`;
+                console.log('Success message:', successMessage, 'studentName:', studentName, 'matric:', matric);
+                showStatus(successMessage, 'success');
                 resetAttendanceForm();
 
                 // Refresh dashboard data
