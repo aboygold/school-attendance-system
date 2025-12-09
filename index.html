@@ -2470,26 +2470,26 @@
             });
 
             // Add student modal
-            addStudentBtn.addEventListener('click', showAddStudentModal);
-            addStudentClose.addEventListener('click', hideAddStudentModal);
-            addStudentForm.addEventListener('submit', handleAddStudent);
+            if (addStudentBtn) addStudentBtn.addEventListener('click', showAddStudentModal);
+            if (addStudentClose) addStudentClose.addEventListener('click', hideAddStudentModal);
+            if (addStudentForm) addStudentForm.addEventListener('submit', handleAddStudent);
 
             // Edit student modal
-            editStudentBtn.addEventListener('click', showEditStudentModal);
-            editStudentClose.addEventListener('click', hideEditStudentModal);
-            editStudentForm.addEventListener('submit', handleEditStudent);
+            if (editStudentBtn) editStudentBtn.addEventListener('click', showEditStudentModal);
+            if (editStudentClose) editStudentClose.addEventListener('click', hideEditStudentModal);
+            if (editStudentForm) editStudentForm.addEventListener('submit', handleEditStudent);
 
             // Complete student modal
-            completeStudentClose.addEventListener('click', hideCompleteStudentModal);
-            completeStudentForm.addEventListener('submit', handleCompleteStudentAndMarkAttendance);
-            skipCompleteBtn.addEventListener('click', handleSkipCompleteAndMarkAttendance);
+            if (completeStudentClose) completeStudentClose.addEventListener('click', hideCompleteStudentModal);
+            if (completeStudentForm) completeStudentForm.addEventListener('submit', handleCompleteStudentAndMarkAttendance);
+            if (skipCompleteBtn) skipCompleteBtn.addEventListener('click', handleSkipCompleteAndMarkAttendance);
 
             // Advanced export modal
-            advancedExportBtn.addEventListener('click', showAdvancedExportModal);
-            exportTemplatesBtn.addEventListener('click', showExportTemplatesModal);
-            advancedExportClose.addEventListener('click', hideAdvancedExportModal);
-            exportTemplatesClose.addEventListener('click', hideExportTemplatesModal);
-            advancedExportForm.addEventListener('submit', handleAdvancedExport);
+            if (advancedExportBtn) advancedExportBtn.addEventListener('click', showAdvancedExportModal);
+            if (exportTemplatesBtn) exportTemplatesBtn.addEventListener('click', showExportTemplatesModal);
+            if (advancedExportClose) advancedExportClose.addEventListener('click', hideAdvancedExportModal);
+            if (exportTemplatesClose) exportTemplatesClose.addEventListener('click', hideExportTemplatesModal);
+            if (advancedExportForm) advancedExportForm.addEventListener('submit', handleAdvancedExport);
 
             // Template buttons
             templateBtns.forEach(btn => {
@@ -2500,42 +2500,45 @@
             });
 
             // Close modal when clicking outside
-            addStudentModal.addEventListener('click', (e) => {
+            if (addStudentModal) addStudentModal.addEventListener('click', (e) => {
                 if (e.target.id === 'add-student-modal') {
                     hideAddStudentModal();
                 }
             });
 
-            editStudentModal.addEventListener('click', (e) => {
+            if (editStudentModal) editStudentModal.addEventListener('click', (e) => {
                 if (e.target.id === 'edit-student-modal') {
                     hideEditStudentModal();
                 }
             });
 
-            completeStudentModal.addEventListener('click', (e) => {
+            if (completeStudentModal) completeStudentModal.addEventListener('click', (e) => {
                 if (e.target.id === 'complete-student-modal') {
                     hideCompleteStudentModal();
                 }
             });
 
-            advancedExportModal.addEventListener('click', (e) => {
+            if (advancedExportModal) advancedExportModal.addEventListener('click', (e) => {
                 if (e.target.id === 'advanced-export-modal') {
                     hideAdvancedExportModal();
                 }
             });
 
-            exportTemplatesModal.addEventListener('click', (e) => {
+            if (exportTemplatesModal) exportTemplatesModal.addEventListener('click', (e) => {
                 if (e.target.id === 'export-templates-modal') {
                     hideExportTemplatesModal();
                 }
             });
 
             // Keyboard shortcuts
-            document.getElementById('shortcuts-btn').addEventListener('click', showShortcutsModal);
-            document.getElementById('shortcuts-close').addEventListener('click', hideShortcutsModal);
+            const shortcutsBtn = document.getElementById('shortcuts-btn');
+            if (shortcutsBtn) shortcutsBtn.addEventListener('click', showShortcutsModal);
+            const shortcutsClose = document.getElementById('shortcuts-close');
+            if (shortcutsClose) shortcutsClose.addEventListener('click', hideShortcutsModal);
 
             // Close modal when clicking outside
-            document.getElementById('shortcuts-modal').addEventListener('click', (e) => {
+            const shortcutsModal = document.getElementById('shortcuts-modal');
+            if (shortcutsModal) shortcutsModal.addEventListener('click', (e) => {
                 if (e.target.id === 'shortcuts-modal') {
                     hideShortcutsModal();
                 }
@@ -2707,7 +2710,7 @@
             attendanceStatus.textContent = message;
             attendanceStatus.className = `status ${type}`;
             attendanceStatus.classList.remove('hidden');
-            setTimeout(() => attendanceStatus.classList.add('hidden'), 3000);
+            setTimeout(() => attendanceStatus.classList.add('hidden'), 5000);
         }
 
         // Realtime
@@ -3701,7 +3704,7 @@
                 setTimeout(() => {
                     hideAddStudentModal();
                     handleMatricInput(); // Re-fetch student data
-                }, 1500);
+                }, 5000); // Wait for status message to be seen
 
             } catch (error) {
                 console.error('Error adding student:', error);
@@ -3872,8 +3875,8 @@
                 if (updateError) throw updateError;
 
                 // Mark attendance
-                const studentName = `${student.other_names} ${student.last_name}`;
-                await markAttendance(matric, phone, completeStudentModal._notes, studentName);
+                const studentName = document.getElementById('complete-student-name').textContent;
+                await markAttendance(matric, phone, completeStudentModal._notes || '', studentName);
                 hideCompleteStudentModal();
 
             } catch (error) {
@@ -3891,8 +3894,8 @@
                 return;
             }
 
-            const studentName = `${student.other_names} ${student.last_name}`;
-            await markAttendance(matric, phone, completeStudentModal._notes, studentName);
+            const studentName = document.getElementById('complete-student-name').textContent;
+            await markAttendance(matric, phone, completeStudentModal._notes || '', studentName);
             hideCompleteStudentModal();
         }
 
@@ -3934,11 +3937,18 @@
                 setTimeout(() => {
                     const matricField = document.getElementById('matric-input');
                     if (matricField) {
-                        matricField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        matricField.focus();
-                        matricField.select(); // Select all text for easy replacement
+                        // Scroll to the attendance section first
+                        const attendanceSection = document.getElementById('attendance');
+                        if (attendanceSection) {
+                            attendanceSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                        // Then focus the input
+                        setTimeout(() => {
+                            matricField.focus();
+                            matricField.select(); // Select all text for easy replacement
+                        }, 300);
                     }
-                }, 800); // Increased delay to ensure DOM updates are complete
+                }, 1000); // Increased delay to ensure DOM updates are complete
             } catch (error) {
                 console.error('Error marking attendance:', error);
                 showStatus('❌ Error marking attendance: ' + error.message, 'error');
